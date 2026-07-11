@@ -8,3 +8,4 @@ pertencem ao resultado do prompt e aos registos especializados.
 |---|---|---|---|---|---|---|
 | 2026-07-11 21:30 | F0 / F0-P00 | PR01 | Concluído | Pendente | Bootstrap da gestão da execução | `02_fase_0_preparacao/pipelines/00_bootstrap_gestao/resultados_execucao/prompt_01_resultado.md` |
 | 2026-07-11 21:42 | F0 / F0-P01 | PR01 | Concluído | Pendente | Backlog detalhado da Fase 0 criado | `02_fase_0_preparacao/pipelines/01_planeamento_fase_0/resultados_execucao/prompt_01_resultado.md` |
+| 2026-07-11 22:05 | F0 / F0-P01 | PR02 | Concluído | Pendente | Quatro pipelines da Fase 0 criadas (13 prompts) | `02_fase_0_preparacao/pipelines/01_planeamento_fase_0/resultados_execucao/prompt_02_resultado.md` |

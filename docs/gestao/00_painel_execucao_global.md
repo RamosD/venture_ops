@@ -5,12 +5,12 @@ dos resultados; aponta para os documentos especializados.
 
 - Estado global: Preparação
 - Fase actual: F0 — Preparação
-- Pipeline actual: F0-P01 — Planeamento da Fase 0
-- Último prompt: F0-P01-PR01 — Concluído / Validação pendente
-- Próximo prompt: A definir (previsivelmente execução dos itens F0-B01/F0-B02)
+- Pipeline actual: F0-P01 — Planeamento da Fase 0 (concluída; validação pendente)
+- Último prompt: F0-P01-PR02 — Concluído / Validação pendente
+- Próximo prompt: F0-P02-PR01, após revisão humana das pipelines
 - Bloqueios críticos: Nenhum
 - Decisões críticas recentes: Nenhuma
-- Progresso resumido: Estrutura de gestão inicializada e backlog detalhado da
-  Fase 0 criado (14 itens, 14 decisões bloqueadoras "A validar"). Sem
-  implementação de produto.
-- Última actualização: 2026-07-11 21:42
+- Progresso resumido: Planeamento da Fase 0 concluído — backlog detalhado (14
+  itens) e quatro pipelines de execução (F0-P02 a F0-P05, 13 prompts) criados.
+  Sem implementação de produto.
+- Última actualização: 2026-07-11 22:05
