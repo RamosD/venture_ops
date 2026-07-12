@@ -48,9 +48,11 @@ Todos os 12 artefactos existem (facto verificado).
 
 ## 5. Decisões vigentes DB-01 a DB-13
 
-Todas foram utilizadas como base por trabalho posterior, pelo que vigoram como
-**Adoptadas tacitamente** (governação não bloqueante). Pendências materiais
-assinaladas não afectam a vigência da decisão, mas continuam por cumprir.
+Nota de vigência: **antes do fecho formal**, DB-01 a DB-13 vigoravam como
+**Adoptadas tacitamente**, por terem sido utilizadas como base por trabalho
+posterior (governação não bloqueante). **Com DEC-20260712-04, passaram a
+Confirmadas**, com as reservas explicitamente indicadas na tabela. A substância
+das decisões não foi alterada.
 
 | Decisão | Artefacto | Conteúdo adoptado | Vigência | Pendência | Impacto no backlog MVP |
 |---|---|---|---|---|---|
@@ -61,7 +63,7 @@ assinaladas não afectam a vigência da decisão, mas continuam por cumprir.
 | DB-05 | 03 | Estados mínimos por entidade; tipo de pendência associado | **Confirmada** | — | Ciclos de vida |
 | DB-06 | 05 | Fonte de verdade única; versões imutáveis; `is_outdated`/`export_policy` | **Confirmada** (DEC-F0-FINAL-08) | — (INC-03 resolvida) | Persistência |
 | DB-07 | 04 | 5 campos obrigatórios da ficha; **testados com VentureOps AI** | **Confirmada** (DEC-F0-FINAL-04) | — (resolvida) | Ficha do produto |
-| DB-08 | 06 | 5 regras determinísticas de atenção; R-AT-02/05 fechadas | **Confirmada** (DEC-F0-FINAL-07/08) | Confirmação externa do pacote (recomendação) | Visão de atenção |
+| DB-08 | 06 | 5 regras determinísticas de atenção; R-AT-02/05 fechadas | **Confirmada** (DEC-F0-FINAL-07/08) | — | Visão de atenção |
 | DB-09 | 07 | Estrutura do pacote + formatos; regra `export_policy` | **Confirmada** | Teste externo (recomendação, não bloqueante) | Execução assistida |
 | DB-10 | 08 | Uma empresa, individual, Owner; acumulação controlada de papéis | **Confirmada** (DEC-F0-FINAL-05) | — (resolvida) | Auth/isolamento |
 | DB-11 | 09 | Stack greenfield; Django Auth; filesystem/S3; requisitos mínimos de deploy | **Confirmada** | Plataforma concreta em MVP-20 (DEC-F0-FINAL-02, não bloqueante) | Fundação/operação |

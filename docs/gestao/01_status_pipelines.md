@@ -15,3 +15,4 @@ saída da Fase 0 com reservas. **Todas as pipelines da Fase 0 estão concluídas
 | F0-P03 | F0 | Modelo funcional do MVP | Concluído | Revista | 3 | 3 | 3 | 0 | — |
 | F0-P04 | F0 | Dados, contexto de IA e segurança | Concluído | Revista (PR01–PR02) | 3 | 3 | 2 | 0 | — |
 | F0-P05 | F0 | Stack, piloto e fecho da Fase 0 | Concluído | Revista | 5 | 5 | 5 | 0 | — (Fase 0 concluída com reservas) |
+| F1-P01 | F1 | Planeamento e decomposição do MVP | Concluído | Não revista | 1 | 1 | 0 | 0 | Geração das pipelines de execução do MVP (F1-P02..P08) |
