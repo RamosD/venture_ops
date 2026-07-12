@@ -307,7 +307,16 @@ Não deve avançar autonomamente para o prompt seguinte.
 
 ## 10. Estados
 
-Para evitar ambiguidade, o estado de execução e o estado de validação devem ser separados.
+Para evitar ambiguidade, distinguem-se três eixos independentes: **estado de
+execução**, **estado de revisão** (informativo, não bloqueante) e **estado de
+decisão** (vigência). A ausência de revisão ou de aprovação humana **não**
+bloqueia, por si só, a continuidade da execução (ver 10.4).
+
+Nota de âmbito: esta governação aplica-se à execução e aos artefactos. **Não**
+altera a regra funcional do produto segundo a qual resultados de IA não podem
+tornar-se informação oficial nem ser aplicados sem validação humana (ver §19 e a
+matriz `04_matriz_validacao_global.md`, que trata a validação de capacidades do
+produto, distinta da revisão documental aqui descrita).
 
 ### 10.1. Estado de execução
 
@@ -335,36 +344,70 @@ Fora do escopo
 | `Adiado`         | Execução suspensa por decisão                      |
 | `Fora do escopo` | Item não pertence à fase ou pipeline               |
 
-### 10.2. Estado de validação
+### 10.2. Estado de revisão
 
-Usar um dos seguintes:
+Informativo e **não bloqueante**. Regista se houve revisão humana, sem a exigir
+para avançar.
 
 ```text
-Pendente
-Validado
-Rever
+Não revista
+Revista
+Revista com reservas
 Não aplicável
 ```
 
-| Estado          | Significado                                       |
-| --------------- | ------------------------------------------------- |
-| `Pendente`      | Implementado, mas ainda não validado              |
-| `Validado`      | Validado com evidência suficiente                 |
-| `Rever`         | Validação falhou ou requer revisão adicional      |
-| `Não aplicável` | O prompt não produz resultado sujeito a validação |
+| Estado                | Significado                                              |
+| --------------------- | -------------------------------------------------------- |
+| `Não revista`         | Ainda não revista por humano (não impede a continuidade) |
+| `Revista`             | Revista pelo operador humano, sem reservas               |
+| `Revista com reservas`| Revista, com observações registadas a tratar             |
+| `Não aplicável`       | Não há revisão humana prevista para este resultado       |
 
-### 10.3. Regra de interpretação
+### 10.3. Estado de decisão
 
-Um prompt pode estar:
+Vigência de uma decisão proposta num artefacto ou resultado.
 
 ```text
-Execução: Concluído
-Validação: Pendente
+Proposta
+Adoptada tacitamente
+Confirmada
+Confirmada com reservas
+Rejeitada
+Substituída
 ```
 
-Isto significa que a implementação terminou, mas ainda não existe evidência suficiente para a considerar validada.
+| Estado                   | Significado                                                                 |
+| ------------------------ | --------------------------------------------------------------------------- |
+| `Proposta`               | Registada, ainda não utilizada como base nem confirmada                     |
+| `Adoptada tacitamente`   | Usada como base por prompt/artefacto/pipeline/fase posterior sem confirmação explícita |
+| `Confirmada`             | Confirmada explicitamente pelo humano                                       |
+| `Confirmada com reservas`| Confirmada com observações registadas                                       |
+| `Rejeitada`              | Recusada; não vigora                                                         |
+| `Substituída`            | Substituída por decisão posterior                                           |
 
-Uma pipeline não deve ser considerada globalmente validada apenas porque todos os prompts estão concluídos.
+Uma decisão passa de `Proposta` a `Adoptada tacitamente` quando é utilizada como
+base por trabalho posterior sem confirmação humana explícita. A adopção tácita é
+rastreável (o resultado que a usa referencia-a) e reversível (pode ser
+confirmada, alterada, rejeitada ou substituída).
+
+### 10.4. Regra de avanço (governação não bloqueante)
+
+Um prompt, pipeline ou fase **pode avançar** quando: os artefactos materiais
+necessários existem; as dependências técnicas necessárias existem; o trabalho
+pode ser executado sem inventar factos ou decisões; os riscos críticos estão
+mitigados ou formalmente aceites; e não existe falha material que impeça o
+objectivo.
+
+**Não** bloquear apenas porque: o estado de revisão é `Não revista`; uma decisão
+permanece `Adoptada tacitamente`; não existe assinatura ou aprovação humana
+formal; ou existem pontos de revisão por responder que não impedem materialmente
+o trabalho.
+
+Um prompt pode estar, por exemplo, `Execução: Concluído` / `Revisão: Não revista`
+— e o trabalho posterior pode prosseguir. Critérios materiais não executados
+continuam pendências reais e **não** podem ser declarados cumpridos sem
+evidência. Uma pipeline não é considerada validada só porque todos os prompts
+estão concluídos.
 
 ---
 
@@ -389,7 +432,7 @@ modelo: <modelo>
 inicio: YYYY-MM-DD HH:mm
 fim: YYYY-MM-DD HH:mm
 estado_execucao: Concluído
-estado_validacao: Pendente
+estado_revisao: Não revista
 commit: <hash ou "não criado">
 ---
 
@@ -425,15 +468,23 @@ commit: <hash ou "não criado">
 - Limitações da validação: Nenhuma.
 - Trabalho não executado: Nenhum.
 
-## 5. Decisões relevantes
+## 5. Decisões relevantes e vigência
 
-- Nenhuma.
+- Nenhuma. (Quando existirem: indicar a decisão e o estado — `Proposta`, `Adoptada tacitamente`, `Confirmada`, etc.)
 
-## 6. Riscos, bloqueios ou dívida técnica
+## 6. Pendências materiais
+
+- Nenhuma. (Trabalho material por executar que continua pendência real, não critério cumprido.)
+
+## 7. Riscos, bloqueios ou dívida técnica
 
 - Nenhum.
 
-## 7. Próximo passo
+## 8. Riscos aceites
+
+- Nenhum. (Riscos assumidos para permitir avanço com reservas.)
+
+## 9. Próximo passo
 
 - <Próxima acção concreta.>
 ```
@@ -446,8 +497,9 @@ commit: <hash ou "não criado">
 * indicar explicitamente `Nenhum` quando uma secção não tiver ocorrências;
 * manter o resumo objectivo;
 * referenciar evidências por caminho;
-* distinguir claramente trabalho executado de trabalho não validado;
-* não declarar sucesso quando a validação não foi executada.
+* distinguir claramente trabalho executado de trabalho não revisto;
+* não declarar sucesso quando a validação material não foi executada;
+* a ausência de revisão humana não impede o avanço, mas não pode ser apresentada como revisão feita.
 
 ---
 
@@ -539,7 +591,7 @@ Exemplo:
 - Estado global: Em execução
 - Fase actual: F1 — MVP
 - Pipeline actual: F1-P03 — Gestão documental
-- Último prompt: F1-P03-PR04 — Validado
+- Último prompt: F1-P03-PR04 — Concluído / Revista
 - Próximo prompt: F1-P03-PR05
 - Bloqueios críticos: Nenhum
 - Última actualização: YYYY-MM-DD HH:mm
@@ -554,12 +606,14 @@ Fonte de verdade do progresso das pipelines.
 Formato recomendado:
 
 ```markdown
-| ID | Fase | Pipeline | Execução | Validação | Prompts | Concluídos | Validados | Bloqueios | Próximo |
+| ID | Fase | Pipeline | Execução | Revisão | Prompts | Concluídos | Revistos | Bloqueios | Próximo |
 |---|---|---|---|---|---:|---:|---:|---|---|
-| F1-P03 | F1 | Gestão documental | Em execução | Pendente | 8 | 4 | 3 | 0 | PR05 |
+| F1-P03 | F1 | Gestão documental | Em execução | Não revista | 8 | 4 | 0 | 0 | PR05 |
 ```
 
-A IA deve actualizar apenas a linha correspondente à pipeline executada.
+A coluna `Revisão` é informativa (não bloqueante); `Revistos` conta prompts com
+revisão humana registada. A IA deve actualizar apenas a linha correspondente à
+pipeline executada.
 
 ---
 
@@ -684,9 +738,9 @@ O diário é um índice cronológico compacto, não um segundo relatório de exe
 Formato recomendado:
 
 ```markdown
-| Data/hora | Fase/Pipeline | Prompt | Execução | Validação | Resumo | Resultado |
+| Data/hora | Fase/Pipeline | Prompt | Execução | Revisão | Resumo | Resultado |
 |---|---|---|---|---|---|---|
-| YYYY-MM-DD HH:mm | F1 / F1-P03 | PR04 | Concluído | Validado | Versionamento documental concluído | `resultados_execucao/prompt_04_resultado.md` |
+| YYYY-MM-DD HH:mm | F1 / F1-P03 | PR04 | Concluído | Não revista | Versionamento documental concluído | `resultados_execucao/prompt_04_resultado.md` |
 ```
 
 Cada execução ou reexecução acrescenta apenas uma linha.
@@ -731,6 +785,10 @@ Não avances para o prompt seguinte.
 ```
 
 O caminho do resultado deve aparecer apenas uma vez.
+
+O estado de revisão é registado quando aplicável, mas **não** é pré-requisito de
+avanço. As decisões propostas por um prompt podem vigorar como `Adoptada
+tacitamente` para o prompt seguinte, sem confirmação humana explícita.
 
 ---
 
@@ -791,10 +849,14 @@ Um prompt ou pipeline deve ser marcado como `Bloqueado` quando existir:
 * credencial ou configuração necessária em falta;
 * incompatibilidade com arquitectura aprovada;
 * ambiguidade funcional que possa causar implementação incorrecta;
-* decisão arquitectural que exija aprovação humana;
 * fonte de verdade indefinida;
 * alteração que ultrapasse o escopo autorizado;
 * impossibilidade de produzir evidência mínima.
+
+A **ausência de revisão ou de aprovação humana não é, por si só, critério de
+bloqueio**. Uma decisão arquitectural que beneficiaria de confirmação humana não
+bloqueia: vigora como `Adoptada tacitamente` (ou `Confirmada com reservas`) e é
+sinalizada, salvo se existir uma falha material das listadas acima.
 
 Um risco crítico não resolvido bloqueia a continuação da pipeline, excepto quando o próximo prompt tem explicitamente como objectivo resolver esse bloqueio.
 
@@ -905,17 +967,12 @@ A decisão deve entrar em `02_log_decisoes_execucao.md` quando afectar:
 * escopo futuro;
 * operação ou manutenção significativa.
 
-Decisões com impacto arquitectural não autorizado devem ser marcadas como:
-
-```text
-Rever
-```
-
-ou:
-
-```text
-Bloqueado
-```
+Decisões com impacto arquitectural que beneficiariam de confirmação humana **não
+bloqueiam** a execução: vigoram como `Adoptada tacitamente` (ou `Confirmada com
+reservas`) e são sinalizadas no resultado e, quando aplicável, no log de
+decisões. Só se marca `Bloqueado` quando existir uma falha material dos critérios
+de §17 (por exemplo, ambiguidade que cause implementação incorrecta ou alteração
+fora do escopo autorizado).
 
 ---
 

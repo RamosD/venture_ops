@@ -81,7 +81,7 @@ Itens do backlog tratados: F0-B05 (F0-05). Decisão bloqueadora: DB-05.
 
 Objectivo: definir os estados mínimos e as transições válidas de produto, documento, decisão, pendência, função, execução e revisão.
 
-Pré-requisito: secção de modelo funcional aprovada (F0-P03-PR01).
+Pré-requisito: secção de modelo funcional existente (F0-P03-PR01). A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B05)
@@ -145,7 +145,7 @@ Itens do backlog tratados: F0-B07 (F0-07). Decisão bloqueadora: DB-07.
 
 Objectivo: fechar os campos mínimos da ficha administrativa do produto e testá-la com um produto real.
 
-Pré-requisitos: modelo funcional (F0-P03-PR01) e estados (F0-P03-PR02) aprovados.
+Pré-requisitos: artefactos de modelo funcional (F0-P03-PR01) e de estados (F0-P03-PR02) existentes. A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B07)

@@ -3,7 +3,7 @@
 * Identificador: F0-P02 (Fase F0).
 * Itens do backlog cobertos: F0-B01, F0-B02, F0-B03 (rastreiam F0-01, F0-02, F0-03 da baseline).
 * Artefactos produzidos: `artefactos/01_segmento_e_caso_uso.md`; `artefactos/02_fluxo_e_modelo_funcional.md` (secções de fluxo e limites funcionais).
-* Pré-requisitos: backlog da Fase 0 (`01_backlog.md`) revisto por humano.
+* Pré-requisitos: backlog da Fase 0 (`01_backlog.md`) existente. A revisão humana é registada quando ocorrer, mas não é pré-requisito de execução.
 * Execução: prompts pela ordem indicada; um humano entrega cada prompt e revê o resultado antes do seguinte.
 
 ## Prompt 01 (opus) — Definir segmento inicial e caso de uso principal
@@ -54,7 +54,7 @@ Critérios de verificação:
 - pelo menos um perfil real candidato a piloto está identificado.
 
 O que não deve ser feito:
-- não fechar decisões como aprovadas; tudo fica A validar até revisão humana;
+- não declarar confirmação humana que não ocorreu; as decisões ficam Propostas e podem vigorar como Adoptadas tacitamente para o trabalho seguinte;
 - não redefinir a visão do produto nem alargar o público-alvo;
 - não copiar integralmente secções da baseline; referenciar por caminho e secção;
 - não criar outros artefactos, código ou estrutura técnica.
@@ -84,7 +84,7 @@ Itens do backlog tratados: F0-B03 (F0-03). Decisão bloqueadora: DB-03. Prepara 
 
 Objectivo: fechar o fluxo funcional ponta a ponta do MVP e confirmar os limites funcionais, incluindo a lista preliminar do que fica fora do MVP.
 
-Pré-requisito: artefacto 01_segmento_e_caso_uso.md criado e revisto por humano (F0-P02-PR01).
+Pré-requisito: artefacto 01_segmento_e_caso_uso.md existente (F0-P02-PR01). A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B03)

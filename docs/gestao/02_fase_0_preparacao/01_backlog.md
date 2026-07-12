@@ -68,8 +68,13 @@ Decisões que têm de ser fechadas nesta fase (fontes: roadmap §3.3; arquitectu
 Convenções comuns a todos os itens (não repetidas item a item):
 
 * **Estado inicial:** Pendente.
-* **Validação humana:** obrigatória — todos os itens fecham decisões e o
-  respectivo artefacto só é considerado aprovado após revisão humana registada.
+* **Critério de conclusão de item (governação não bloqueante):** um item
+  considera-se cumprido quando o **artefacto foi produzido**, com a **evidência**
+  exigida e a **decisão registada** (que pode vigorar como `Adoptada
+  tacitamente`). A **revisão humana é registada quando ocorrer**, mas a sua
+  ausência **não** impede o avanço nem torna o item incumprido. Critérios
+  materiais (por exemplo, um teste real) só são cumpridos com evidência; não são
+  substituídos por revisão.
 * **Inputs comuns:** `02_visao_do_produto.md`, `03_arquitetura.md`,
   `04_roadmap_faseado.md`, `05_backlog_macro.md` (referenciados por secção em
   cada item; não reler integralmente).
@@ -288,11 +293,19 @@ Todos ─► F0-B14
 | R-01 | Análise prolongada sem avançar para validação prática | Limitar a fase às 14 decisões bloqueadoras; nenhum artefacto novo fora dos 12 previstos | Roadmap §3.6 |
 | R-02 | Escopo reabrir continuamente | Lista formal de itens fora do MVP em F0-B14, sujeita a controlo de mudança | Roadmap §3.6 |
 | R-03 | Estados e entidades demasiado detalhados | Manter apenas campos e estados necessários ao fluxo piloto | Roadmap §3.6 |
-| R-04 | Decisões tomadas sem validação humana registada | Todos os itens exigem validação humana antes de "Validado" | Guia de gestão |
+| R-04 | Decisões adoptadas tacitamente permanecerem por confirmar | Vigência rastreável (`Adoptada tacitamente`); revisão registada quando ocorrer; confirmação/rejeição no fecho ou quando revista | Guia de gestão §10 |
 | R-05 | Levantamento técnico (F0-B11) assumir stack inexistente | Levantar apenas o que existe; desvios face à arquitectura registados como decisão | Arquitectura §2.10 |
 | R-06 | Teste do pacote de contexto (F0-B09) expor informação sensível | Usar conteúdo não sensível ou fictício controlado no teste manual | Arquitectura §11.10 |
 
 ## 8. Critérios de saída da Fase 0
+
+Leitura sob a governação não bloqueante (guia §10): onde os critérios dizem
+"aprovado/aprovada", lê-se **"produzido, com a decisão vigente (`Adoptada
+tacitamente` ou `Confirmada`) e a revisão registada quando exista"**. A revisão
+humana não é gate; contudo, os critérios **materiais** (o artefacto existe; o
+teste real foi executado; os participantes do piloto estão identificados) só se
+consideram cumpridos com evidência. O fecho pode decidir avançar **com reservas**
+desde que não existam bloqueios materiais.
 
 A fase termina quando (baseline + roadmap §3.7):
 

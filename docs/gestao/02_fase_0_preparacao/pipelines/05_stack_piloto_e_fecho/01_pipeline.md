@@ -3,7 +3,7 @@
 * Identificador: F0-P05 (Fase F0).
 * Itens do backlog cobertos: F0-B08, F0-B10, F0-B11, F0-B13, F0-B14 (rastreiam F0-08, F0-10, F0-11, F0-13, F0-14 da baseline).
 * Artefactos produzidos: `artefactos/09_stack_repositorio_padroes.md`; `artefactos/08_modelo_utilizadores_empresas.md`; `artefactos/06_regras_visao_atencao.md`; `artefactos/11_plano_piloto.md`; `artefactos/12_decisao_saida_fase_0.md`.
-* Pré-requisitos: os Prompts 01 e 02 dependem apenas do backlog e da pipeline F0-P02 (Prompt 02); o Prompt 03 exige os artefactos 03 e 04 aprovados (pipeline F0-P03); o Prompt 05 exige todos os artefactos 01 a 11 aprovados.
+* Pré-requisitos (existência material, não aprovação): os Prompts 01 e 02 dependem do backlog e do artefacto de fluxo (F0-P02); o Prompt 03 exige a existência dos artefactos 03 e 04 (pipeline F0-P03); o Prompt 05 exige a existência de todos os artefactos 01 a 11. A revisão humana não é pré-requisito.
 * Ordem entre pipelines: os Prompts 01 e 02 devem ser executados antes do Prompt 03 da pipeline F0-P04 (segurança), que deles depende.
 * Execução: prompts pela ordem indicada; um humano entrega cada prompt e revê o resultado antes do seguinte.
 
@@ -82,7 +82,7 @@ Itens do backlog tratados: F0-B10 (F0-10). Decisão bloqueadora: DB-10.
 
 Objectivo: propor as decisões formais sobre o modelo de utilizadores e empresas do MVP: empresas por conta, individual ou multiutilizador, e papéis mínimos.
 
-Pré-requisito: artefacto 01_segmento_e_caso_uso.md aprovado (F0-P02-PR01).
+Pré-requisito: artefacto 01_segmento_e_caso_uso.md existente (F0-P02-PR01). A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B10)
@@ -118,7 +118,7 @@ Critérios de verificação:
 O que não deve ser feito:
 - não desenhar tabelas, esquemas ou modelos de permissões técnicos;
 - não incluir convites, notificações ou permissões avançadas no MVP;
-- não fechar as decisões como aprovadas; ficam A validar;
+- não declarar confirmação humana que não ocorreu; as decisões ficam Propostas e podem vigorar como Adoptadas tacitamente;
 - não reproduzir a baseline.
 
 Fecho e registo obrigatório:
@@ -146,7 +146,7 @@ Itens do backlog tratados: F0-B08 (F0-08). Decisão bloqueadora: DB-08.
 
 Objectivo: definir regras determinísticas e explicáveis para a visão de atenção do MVP.
 
-Pré-requisitos: artefactos 03_estados_e_transicoes.md e 04_ficha_administrativa_produto.md aprovados (pipeline F0-P03). Não executar este prompt antes dessa aprovação.
+Pré-requisitos (existência material, não aprovação): os artefactos 03_estados_e_transicoes.md e 04_ficha_administrativa_produto.md devem **existir** (pipeline F0-P03). A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B08)
@@ -212,7 +212,7 @@ Itens do backlog tratados: F0-B13 (F0-13). Decisão bloqueadora: DB-13.
 
 Objectivo: definir como o MVP será validado: participantes, produtos reais, actividades, recolha de feedback e critérios de sucesso.
 
-Pré-requisito: artefacto 01_segmento_e_caso_uso.md aprovado (F0-P02-PR01).
+Pré-requisito: artefacto 01_segmento_e_caso_uso.md existente (F0-P02-PR01). A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B13)
@@ -278,7 +278,7 @@ Itens do backlog tratados: F0-B14 (F0-14). Decisão bloqueadora: DB-14.
 
 Objectivo: realizar a revisão cruzada dos artefactos da Fase 0, consolidar o congelamento do escopo do MVP e propor a decisão formal de saída da fase.
 
-Pré-requisito: todos os artefactos 01 a 11 de docs/gestao/02_fase_0_preparacao/artefactos/ criados e aprovados por humano. Não executar este prompt com artefactos em falta ou por aprovar.
+Pré-requisito (existência material, não aprovação): todos os artefactos 01 a 11 de docs/gestao/02_fase_0_preparacao/artefactos/ devem **existir**. Não executar com artefactos em falta. A revisão ou aprovação humana **não** é exigida; as decisões dos artefactos podem vigorar como Adoptadas tacitamente. O fecho pode propor **avanço com reservas** quando não existirem bloqueios materiais, registando as decisões adoptadas tacitamente e as pendências materiais residuais.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B14 e secção 8, critérios de saída)
@@ -294,10 +294,10 @@ Ficheiros que não devem ser alterados:
 Trabalho a realizar:
 1. revisão cruzada: verificar coerência entre artefactos (fluxo vs entidades vs estados vs ficha vs regras de atenção vs fonte de verdade vs pacote de contexto vs utilizadores vs stack vs segurança vs piloto); registar cada incoerência encontrada com referência aos artefactos afectados;
 2. verificar cada critério de saída da Fase 0 (backlog, secção 8) e indicar o artefacto que o evidencia;
-3. consolidar a lista final de escopo do MVP: incluído, excluído, opcional e adiado, a partir dos limites preliminares e das decisões aprovadas;
+3. consolidar a lista final de escopo do MVP: incluído, excluído, opcional e adiado, a partir dos limites preliminares e das decisões vigentes (Adoptadas tacitamente ou Confirmadas);
 4. verificar que nenhuma decisão bloqueadora (DB-01 a DB-13) permanece em aberto; se alguma permanecer, marcar a fase como Bloqueado e identificar o que falta;
 5. propor a decisão formal de saída: avançar para a Fase 1, corrigir itens específicos, ou não avançar, com justificação;
-6. indicar que, após aprovação humana, a decisão de saída deve ser registada em docs/gestao/02_log_decisoes_execucao.md com o template DEC definido em docs/gestao/README.md.
+6. registar a decisão de saída em docs/gestao/02_log_decisoes_execucao.md com o template DEC (docs/gestao/README.md); a decisão pode vigorar como Adoptada tacitamente ou Confirmada com reservas, sem exigir aprovação humana formal para o avanço.
 
 Artefacto a criar:
 - docs/gestao/02_fase_0_preparacao/artefactos/12_decisao_saida_fase_0.md
@@ -313,10 +313,10 @@ Critérios de verificação:
 - todos os critérios de saída da secção 8 do backlog estão verificados com referência ao artefacto que os evidencia;
 - a lista de escopo congelado não contém itens A validar pendentes, ou a fase está marcada como Bloqueado;
 - todas as incoerências encontradas estão registadas com os artefactos afectados;
-- a decisão de saída está proposta com justificação e aguarda aprovação humana.
+- a decisão de saída está registada com justificação e vigência (Adoptada tacitamente, Confirmada ou Confirmada com reservas), podendo propor avanço com reservas se não houver bloqueios materiais.
 
 O que não deve ser feito:
-- não aprovar a saída da fase; a aprovação é humana;
+- não declarar cumpridos critérios materiais sem evidência (artefacto em falta, teste real não executado, participantes por identificar); a confirmação humana explícita, quando ocorrer, é registada, mas o avanço com reservas não depende dela;
 - não corrigir artefactos para eliminar incoerências sem as registar;
 - não iniciar a decomposição do backlog do MVP;
 - não declarar critérios cumpridos sem evidência.

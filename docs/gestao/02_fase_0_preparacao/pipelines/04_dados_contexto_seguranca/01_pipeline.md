@@ -3,7 +3,7 @@
 * Identificador: F0-P04 (Fase F0).
 * Itens do backlog cobertos: F0-B06, F0-B09, F0-B12 (rastreiam F0-06, F0-09, F0-12 da baseline).
 * Artefactos produzidos: `artefactos/05_fonte_de_verdade_bd_markdown.md`; `artefactos/07_pacote_contexto_ia.md`; `artefactos/10_requisitos_seguranca_mvp.md`.
-* Pré-requisitos: pipeline F0-P02 concluída; modelo funcional (F0-P03-PR01) aprovado. O Prompt 03 exige ainda os artefactos 08 e 09 (pipeline F0-P05, prompts 01 e 02) aprovados.
+* Pré-requisitos (existência material, não aprovação): fluxo (F0-P02) e modelo funcional (F0-P03-PR01) existentes. O Prompt 03 exige ainda a existência dos artefactos 08 e 09 (pipeline F0-P05, prompts 01 e 02).
 * Execução: prompts pela ordem indicada; um humano entrega cada prompt e revê o resultado antes do seguinte.
 
 ## Prompt 01 (opus) — Definir a fronteira BD/Markdown e o versionamento
@@ -18,7 +18,7 @@ Itens do backlog tratados: F0-B06 (F0-06). Decisão bloqueadora: DB-06.
 
 Objectivo: definir, para cada tipo de informação do modelo funcional, a fonte oficial (base de dados ou Markdown), a política de versões documentais e as regras de actualização.
 
-Pré-requisito: secção de modelo funcional aprovada (F0-P03-PR01).
+Pré-requisito: secção de modelo funcional existente (F0-P03-PR01). A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B06)
@@ -84,7 +84,7 @@ Itens do backlog tratados: F0-B09 (F0-09). Decisão bloqueadora: DB-09.
 
 Objectivo: padronizar o pacote de contexto para execução assistida por IA (utilização manual, local ou externa), o formato de importação do resultado, e testar o pacote manualmente.
 
-Pré-requisitos: fluxo aprovado (F0-P02-PR02) e fronteira BD/Markdown aprovada (F0-P04-PR01).
+Pré-requisitos: artefactos de fluxo (F0-P02-PR02) e de fronteira BD/Markdown (F0-P04-PR01) existentes. A revisão humana não é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B09)
@@ -150,7 +150,7 @@ Itens do backlog tratados: F0-B12 (F0-12). Decisão bloqueadora: DB-12.
 
 Objectivo: estabelecer o checklist de controlos de segurança não adiáveis do MVP, incluindo o nível de auditoria e as regras de validação humana.
 
-Pré-requisitos: artefactos 08_modelo_utilizadores_empresas.md e 09_stack_repositorio_padroes.md aprovados (pipeline F0-P05, prompts 01 e 02). Não executar este prompt antes dessa aprovação.
+Pré-requisitos (existência material, não aprovação): os artefactos 08_modelo_utilizadores_empresas.md e 09_stack_repositorio_padroes.md devem **existir** (pipeline F0-P05, prompts 01 e 02). Não executar este prompt sem esses artefactos; a revisão ou aprovação humana **não** é exigida para avançar.
 
 Contexto obrigatório:
 - docs/gestao/02_fase_0_preparacao/01_backlog.md (item F0-B12)

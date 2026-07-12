@@ -6,7 +6,7 @@ modelo: <modelo>
 inicio: YYYY-MM-DD HH:mm
 fim: YYYY-MM-DD HH:mm
 estado_execucao: Pendente
-estado_validacao: Pendente
+estado_revisao: Não revista
 commit: <hash ou "não criado">
 ---
 
@@ -42,14 +42,22 @@ commit: <hash ou "não criado">
 - Limitações da validação: Nenhuma.
 - Trabalho não executado: Nenhum.
 
-## 5. Decisões relevantes
+## 5. Decisões relevantes e vigência
+
+- Nenhuma. (Indicar estado: Proposta / Adoptada tacitamente / Confirmada / etc.)
+
+## 6. Pendências materiais
 
 - Nenhuma.
 
-## 6. Riscos, bloqueios ou dívida técnica
+## 7. Riscos, bloqueios ou dívida técnica
 
 - Nenhum.
 
-## 7. Próximo passo
+## 8. Riscos aceites
+
+- Nenhum.
+
+## 9. Próximo passo
 
 - <Próxima acção concreta.>
