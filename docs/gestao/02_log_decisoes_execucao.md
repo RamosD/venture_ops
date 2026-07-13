@@ -102,3 +102,40 @@ decisão evoluir, registar a nova entrada indicando que substitui a anterior.
 - Estado: Activa
 - Substitui: DEC-20260712-03 (preservada no histórico, não apagada nem editada)
 - Resultado relacionado: `02_fase_0_preparacao/pipelines/05_stack_piloto_e_fecho/resultados_execucao/prompt_05_resultado.md` (Fecho formal — 2026-07-12 15:20); `02_fase_0_preparacao/artefactos/12_decisao_saida_fase_0.md` (§17).
+
+## DEC-20260712-05 — Clarificações de decomposição da Fase 1 (fronteiras de módulos, revisão de produto, export_policy e tentativas)
+
+- Data: 2026-07-12
+- Fase: F1
+- Pipeline: F1-P01
+- Prompt: F1-P01-PR02
+- Decisão: consolidam-se quatro clarificações à decomposição do MVP, aplicadas ao backlog `03_fase_1_mvp/01_backlog.md`, sem alterar o escopo funcional congelado (DB-14):
+  - **CLR-01 (fronteiras de módulos)** — o monólito modular tem fronteiras explícitas: os módulos dependem dos serviços públicos de outros módulos, com dependências explícitas e orientadas numa única direcção, sem ciclos nem acesso directo ao estado interno/tabelas de outro módulo; **não** se cria sistema genérico de eventos ou plugins para evitar dependências normais. Aplicada a MVP-01.R1.
+  - **CLR-02 (revisão de produto)** — `last_reviewed_at` é inicializada na criação e só é actualizada por uma **operação explícita de revisão** ("marcar como revisto"), auditável; edições comuns não a alteram nem silenciam o sinal R-AT-01. Aplicada a MVP-05 (H3, R1, R4, T1, T4) e MVP-16.R4.
+  - **CLR-03 (export_policy = denied)** — `denied` impede a selecção de um documento para novo pacote e, se uma execução já o referenciar e a política passar a `denied`, **bloqueia a geração apresentando o motivo** (nunca exclusão silenciosa com pacote incompleto); `confirm` exige confirmação; `allowed` normal; verificações no backend; tentativas bloqueadas auditadas. Na exportação de portabilidade (MVP-19), documentos `denied` são excluídos mas **listados no manifesto com o motivo**. Aplicada a MVP-12 (H2, R3, R4, T3, T5) e MVP-19 (H2, R2, R3, T3).
+  - **CLR-04 (tentativas e revisões)** — cada importação de resultado cria uma **tentativa imutável**, registo subordinado ao módulo de execução (não entidade autónoma nem motor de workflow); a execução aponta para a tentativa actual; pedir correcção não apaga a tentativa nem a decisão anteriores; a aplicação controlada indica exactamente a **tentativa aprovada** que a originou; a auditoria não substitui estes dados funcionais. Aplicada a MVP-13 (C1, H1, H2, R1–R4, T1–T5), MVP-14 (C1, H1, H2, R1–R4, T1–T5) e MVP-15 (H1, H2, R1–R3, T1–T4).
+- Motivo: as quatro clarificações foram pedidas no prompt F1-P01-PR02 para remover ambiguidades que, de outro modo, seriam decididas ad hoc na implementação, com risco de fonte de verdade concorrente, perda de histórico ou exportação incompleta.
+- Alternativas consideradas: deixar as clarificações apenas no backlog sem registo formal (rejeitada: afectam modelo de dados de execução e comportamento visível — guia §20); criar quatro decisões separadas (rejeitada: instrução de entrada consolidada e append-only).
+- Impacto: refina o modelo de execução (tentativas/revisões subordinadas), a semântica de revisão de produto, o comportamento de exportação e as fronteiras de módulos; não altera o escopo do MVP nem introduz novas entidades de negócio autónomas.
+- Ficheiros ou áreas afectadas: `03_fase_1_mvp/01_backlog.md` (MVP-01, 05, 12, 13, 14, 15, 16, 19; §17).
+- Estado: Activa
+- Substitui: —
+- Resultado relacionado: `03_fase_1_mvp/pipelines/01_planeamento_mvp/resultados_execucao/prompt_02_resultado.md`.
+
+## DEC-20260712-06 — Correcção de dependências técnicas de arranque de F1-P02 (CustomUser, fundação em PR02, /api/system/ping)
+
+- Data: 2026-07-12
+- Fase: F1
+- Pipeline: F1-P01
+- Prompt: F1-P01-PR03
+- Decisão: consolidam-se três pontos estruturais que corrigem dependências técnicas de F1-P02 antes da sua execução, sem alterar o escopo funcional congelado (DB-14) nem a baseline:
+  - **Modelo de utilizador próprio obrigatório desde a primeira migração** — adopta-se um `CustomUser` baseado no sistema de autenticação do Django, configurado via `AUTH_USER_MODEL`, com email único como identificador; a *decisão estrutural* é fechada em F1-P02-PR01 e o modelo é criado em F1-P02-PR02; F1-P02-PR07 implementa apenas os *fluxos* de autenticação. Não se adia a criação do modelo próprio para PR07.
+  - **Fundação de identidade e empresa deslocada para F1-P02-PR02** — `CustomUser`, `Organisation` e `Membership` (com convenção reutilizável de entidade empresarial e relação real e obrigatória com `Organisation`) passam a ser criados em PR02; F1-P02-PR10 deixa de os recriar e passa a implementar apenas o onboarding e o comportamento da empresa (migrações adicionais em PR10 só se justificadas).
+  - **Endpoint técnico `/api/system/ping` antes dos health checks** — F1-P02-PR01 cria um endpoint mínimo, independente da base de dados, para smoke test e integração inicial frontend–backend, consumido por F1-P02-PR03; não substitui `/health/live` e `/health/ready`, que permanecem em F1-P02-PR05.
+- Motivo: a revisão de pré-execução de F1-P02 identificou inconsistências que, mantidas, arriscavam migrações incompatíveis, introdução de `organisation_id` antes de existir `Organisation`, adopção tardia de um modelo de utilizador próprio, dependência do frontend de um endpoint inexistente e ordem de criação contraditória entre PR02 e PR10.
+- Alternativas consideradas: adiar o `CustomUser` para PR07 (rejeitada: forçaria migração de substituição do modelo de utilizador, tecnicamente incoerente); manter a criação de `Organisation`/`Membership` em PR10 (rejeitada: auditoria e isolamento dependem dessas entidades desde PR06/PR11); o frontend consumir os health checks de PR05 (rejeitada: PR03 antecede PR05 e os health checks têm outra responsabilidade).
+- Impacto: F1-P02-PR01 (decisões estruturais + `/api/system/ping`), PR02 (fundação de identidade/empresa), PR03 (consome `/api/system/ping`), PR06 (AuditEvent com `actor`/`organisation` opcionais e sem cascata destrutiva), PR09 (rate limiting persistente, sem Redis), PR10 (onboarding, sem recriar entidades), PR11 (duas empresas por fixtures/factories). Valores concretos ainda a determinar (identificadores, toolchain, fronteira HTTP) permanecem para F1-P02-PR01 registar em `docs/produto/00_decisoes_arranque.md`; não são fixados aqui.
+- Ficheiros ou áreas afectadas: `03_fase_1_mvp/pipelines/02_fundacao_autenticacao_isolamento/01_pipeline.md` (PR01–PR03, PR06, PR09–PR11); `03_fase_1_mvp/02_mapa_pipelines.md` (F1-P02); `02_fase_0_preparacao/01_backlog.md` (estados de fecho).
+- Estado: Activa
+- Substitui: —
+- Resultado relacionado: `03_fase_1_mvp/pipelines/01_planeamento_mvp/resultados_execucao/prompt_03_resultado.md`.

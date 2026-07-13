@@ -1,0 +1,6 @@
+# Dependências do backend do VentureOps AI (stack aprovada — artefacto 09).
+# Versões fixadas; actualizar de forma deliberada.
+Django==5.2.16
+djangorestframework==3.16.1
+django-cors-headers==4.9.0
+psycopg[binary]==3.2.13

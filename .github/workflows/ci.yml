@@ -1,0 +1,71 @@
+name: CI
+
+# CI mínimo: build + testes. Sem deploy automático nesta fase.
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ventureops
+          POSTGRES_USER: ventureops
+          POSTGRES_PASSWORD: ventureops_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ventureops -d ventureops"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      DJANGO_SECRET_KEY: ci-secret-key-not-for-production
+      POSTGRES_DB: ventureops
+      POSTGRES_USER: ventureops
+      POSTGRES_PASSWORD: ventureops_ci
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+      STORAGE_ROOT: ${{ runner.temp }}/storage
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+      - name: Verificação de configuração
+        run: python manage.py check
+      - name: Sem migrações em falta (sem drift)
+        run: python manage.py makemigrations --check --dry-run
+      - name: Migrações numa base limpa
+        run: python manage.py migrate --noinput
+      - name: Testes backend
+        run: python manage.py test
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Instalar dependências
+        run: npm ci
+      - name: Build do frontend
+        run: npm run build
+      - name: Testes do frontend
+        run: npm run test
+
+# Sem passos de deploy/rollback: fora do âmbito desta fase (MVP-20/F1-P08).

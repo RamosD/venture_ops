@@ -4,7 +4,9 @@
 
 **Fase:** F0 — Preparação e alinhamento
 **Baseline de referência:** `docs/gestao/01_baseline/05_backlog_macro.md` (itens F0-01 a F0-14)
-**Estado da fase:** Pendente
+**Estado da fase:** Concluída com reservas
+**Decisão de saída:** DEC-20260712-04
+**Data de fecho:** 2026-07-12
 
 **Objectivo:** fechar as decisões que bloqueiam a implementação segura do MVP,
 produzindo uma especificação funcional e técnica mínima que permita gerar o
@@ -13,6 +15,11 @@ decisões, não código.
 
 Esta fase deve reduzir ambiguidade, não produzir documentação excessiva
 (roadmap, §3.1).
+
+> **Nota de estado histórico:** este backlog foi criado quando a Fase 0 estava
+> pendente. Os conteúdos dos itens preservam o planeamento original; os estados
+> desta página foram actualizados após o fecho formal da fase
+> (DEC-20260712-04, 2026-07-12). A baseline não foi alterada.
 
 ## 2. Escopo incluído
 
@@ -43,25 +50,28 @@ Esta fase deve reduzir ambiguidade, não produzir documentação excessiva
 
 ## 4. Decisões bloqueadoras
 
-Decisões que têm de ser fechadas nesta fase (fontes: roadmap §3.3; arquitectura
-§17). Todas estão por fechar — estado **A validar**.
+Decisões que tinham de ser fechadas nesta fase (fontes: roadmap §3.3;
+arquitectura §17). Todas foram **Confirmadas** no fecho formal da Fase 0
+(DEC-20260712-04); **nenhuma permanece A validar**. As condições transferidas
+para a Fase 1 são referenciadas na coluna "Condição / nota". A referência ao
+item que tratou cada decisão é preservada.
 
-| # | Decisão | Item que a trata | Estado |
-|---|---|---|---|
-| DB-01 | Segmento inicial exacto (dimensão da equipa, n.º de produtos) | F0-B01 | A validar |
-| DB-02 | Caso de uso principal do MVP | F0-B02 | A validar |
-| DB-03 | Fluxo funcional ponta a ponta | F0-B03 | A validar |
-| DB-04 | Entidades mínimas e relações | F0-B04 | A validar |
-| DB-05 | Estados oficiais de produto, documento, decisão, pendência, função, execução e revisão | F0-B05 | A validar |
-| DB-06 | Fronteira BD/Markdown, política de versões e regras de actualização | F0-B06 | A validar |
-| DB-07 | Campos obrigatórios da ficha administrativa do produto | F0-B07 | A validar |
-| DB-08 | Regras determinísticas da visão de atenção | F0-B08 | A validar |
-| DB-09 | Formato do pacote de contexto e formato de importação de resultados | F0-B09 | A validar |
-| DB-10 | Uma ou várias empresas por conta; individual ou multiutilizador; papéis mínimos | F0-B10 | A validar |
-| DB-11 | Stack efectiva, reutilização de autenticação, armazenamento de ficheiros no piloto, plataforma de deploy | F0-B11 | A validar |
-| DB-12 | Nível de auditoria e controlos de segurança não adiáveis | F0-B12 | A validar |
-| DB-13 | Utilizadores piloto, dados e critérios de sucesso | F0-B13 | A validar |
-| DB-14 | Lista final de escopo congelado do MVP | F0-B14 | A validar |
+| # | Decisão | Item que a trata | Estado | Condição / nota |
+|---|---|---|---|---|
+| DB-01 | Segmento inicial exacto (dimensão da equipa, n.º de produtos) | F0-B01 | Confirmada | — |
+| DB-02 | Caso de uso principal do MVP | F0-B02 | Confirmada | — |
+| DB-03 | Fluxo funcional ponta a ponta | F0-B03 | Confirmada | — |
+| DB-04 | Entidades mínimas e relações | F0-B04 | Confirmada | — |
+| DB-05 | Estados oficiais de produto, documento, decisão, pendência, função, execução e revisão | F0-B05 | Confirmada | — |
+| DB-06 | Fronteira BD/Markdown, política de versões e regras de actualização | F0-B06 | Confirmada | Marcadores `is_outdated`/`export_policy` fechados (DEC-F0-FINAL-08) |
+| DB-07 | Campos obrigatórios da ficha administrativa do produto | F0-B07 | Confirmada | Ficha testada com produto real: VentureOps AI (DEC-F0-FINAL-04) |
+| DB-08 | Regras determinísticas da visão de atenção | F0-B08 | Confirmada | — |
+| DB-09 | Formato do pacote de contexto e formato de importação de resultados | F0-B09 | Confirmada | Confirmação externa do pacote validada no piloto (MVP-22) |
+| DB-10 | Uma ou várias empresas por conta; individual ou multiutilizador; papéis mínimos | F0-B10 | Confirmada | Acumulação controlada de papéis Owner/Operador/Revisor (DEC-F0-FINAL-05) |
+| DB-11 | Stack efectiva, reutilização de autenticação, armazenamento de ficheiros no piloto | F0-B11 | Confirmada | **Plataforma concreta de deploy transferida para `MVP-20`** (DEC-F0-FINAL-02); requisitos mínimos já vigentes |
+| DB-12 | Nível de auditoria e controlos de segurança não adiáveis | F0-B12 | Confirmada | Implementação e verificação dos controlos em MVP-18/MVP-21 |
+| DB-13 | Utilizadores piloto, dados e critérios de sucesso | F0-B13 | Confirmada | Participante mínimo: Aldino Ramos (DEC-F0-FINAL-03); execução do piloto em MVP-22 |
+| DB-14 | Lista final de escopo congelado do MVP | F0-B14 | Confirmada | Escopo congelado em `artefactos/12_decisao_saida_fase_0.md` |
 
 ## 5. Itens detalhados da Fase 0
 
@@ -268,9 +278,9 @@ Convenções comuns a todos os itens (não repetidas item a item):
 ### Externas à fase
 
 * baseline aprovada (visão, arquitectura, roadmap, backlog macro) — existe;
-* disponibilidade de um responsável funcional para validar decisões — A validar;
-* disponibilidade de pelo menos um cenário real de utilização — A validar;
-* acesso ao ambiente/repositório real para o levantamento de F0-B11 — A validar.
+* disponibilidade de um responsável funcional para validar decisões — cumprido (Aldino Ramos, DEC-F0-FINAL-03);
+* disponibilidade de pelo menos um cenário real de utilização — cumprido (VentureOps AI, DEC-F0-FINAL-04);
+* acesso ao ambiente/repositório real para o levantamento de F0-B11 — cumprido (levantamento greenfield concluído, artefacto 09).
 
 ### Internas (grafo resumido)
 
@@ -325,8 +335,8 @@ A fase termina quando (baseline + roadmap §3.7):
 
 ## 9. Artefactos esperados
 
-A criar em `docs/gestao/02_fase_0_preparacao/artefactos/` (previstos, ainda não
-criados):
+Em `docs/gestao/02_fase_0_preparacao/artefactos/` (os artefactos 01 a 12
+**existem**; caminhos e rastreabilidade preservados):
 
 | Artefacto | Itens que o produzem |
 |---|---|

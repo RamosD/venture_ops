@@ -101,7 +101,7 @@ fluxo ponta a ponta.
   Pré-condições: Docker e código clonado. | Fluxo: arrancar compose → backend, frontend e BD sobem → health check responde. | Resultado: ambiente local funcional. | Regras: configuração validada no arranque; segredos fora do código (SEC-SEC-01). | Erros: configuração em falta → arranque falha com mensagem clara. | Aceitação: `docker compose up` deixa a aplicação acessível e o health check devolve OK. | Evidência: demonstração + saída do health check.
 
 **Requisitos técnicos**
-- MVP-01.R1 — Estrutura modular do backend por domínios (accounts, organisations, portfolio, documents, decisions, work_items, functions, executions, audit, storage, common), sem acoplamento entre módulos (arquitectura §5.1).
+- MVP-01.R1 — Estrutura modular do backend por domínios (accounts, organisations, portfolio, documents, decisions, work_items, functions, executions, audit, storage, common) com **fronteiras explícitas** (arquitectura §5.1): módulos podem depender dos **serviços públicos** de outros módulos; as dependências são **explícitas e orientadas numa única direcção**, sem ciclos; **evita-se o acesso directo a tabelas ou ao estado interno** de outro módulo; **não** se cria um sistema genérico de eventos ou plugins para evitar as dependências normais do monólito modular.
 - MVP-01.R2 — Migrações versionadas desde o início; **todas** as entidades empresariais criadas já com `organisation_id` (SEC-ISO-01).
 - MVP-01.R3 — Adaptador de armazenamento documental com interface única (filesystem em dev; S3-compatível como implementação futura sem alterar chamadores).
 - MVP-01.R4 — Configuração por variáveis de ambiente com validação no arranque; sem segredos no repositório.
@@ -229,19 +229,22 @@ fluxo ponta a ponta.
   Pré-condições: empresa activa. | Fluxo: criar → só Nome e Propósito exigem escrita → Estado=Activo, Responsável=operador, Última revisão=agora por defeito. | Resultado: ficha completa com esforço curto. | Regras: defaults do artefacto 04 §4. | Erros: nome vazio → validação. | Aceitação: criação exige apenas 2 campos escritos. | Evidência: teste + demonstração (piloto reconfirma).
 - **MVP-05.H2** — Como fundador, pretendo abrir a ficha e ver o contexto agregado do produto, para decidir sem procurar noutros sítios.
   Pré-condições: produto com entidades associadas. | Fluxo: abrir ficha → separadores visão geral/documentos/decisões/pendências/execuções. | Resultado: contexto agregado. | Regras: agregadas por associação, não campos de entrada (artefacto 04 §2.3). | Erros: — | Aceitação: agregadas correctas por produto. | Evidência: teste de API + UI.
+- **MVP-05.H3** — Como operador, pretendo marcar explicitamente um produto como revisto, para actualizar a "Data da última revisão" sem que edições comuns o façam.
+  Pré-condições: produto activo. | Fluxo: acção explícita "marcar como revisto" → `last_reviewed_at` = agora. | Resultado: sinal de revisão actualizado de forma deliberada. | Regras (clarificação 5.2): a data é inicializada na criação; **uma edição comum do produto NÃO actualiza `last_reviewed_at`**; só a operação explícita de revisão a actualiza; operação auditável; alterações administrativas comuns não eliminam silenciosamente o sinal "produto sem revisão". | Erros: acção sobre produto arquivado → rejeitada. | Aceitação: editar campos ≠ revisão; "marcar como revisto" actualiza a data e gera evento; o sinal R-AT-01 persiste até uma revisão explícita. | Evidência: teste que prova que a edição comum não mexe na data.
 
 **Requisitos técnicos**
-- MVP-05.R1 — Campos obrigatórios/opcionais conforme artefacto 04 §2; "Data da última revisão" actualizada automaticamente na criação/edição relevante.
+- MVP-05.R1 — Campos obrigatórios/opcionais conforme artefacto 04 §2. **`last_reviewed_at` é inicializada na criação e só é actualizada por uma operação explícita de revisão** (MVP-05.H3); edições comuns do produto não a alteram (clarificação 5.2).
 - MVP-05.R2 — Vistas agregadas via associações (sem duplicação de dados; RT-04).
 - MVP-05.R3 — Nível de atenção calculado, nunca persistido (artefacto 02 §6.5).
+- MVP-05.R4 — A operação de revisão é auditável (evento de produto) e é a única fonte de actualização de `last_reviewed_at` que alimenta R-AT-01.
 
 **Tarefas**
 | ID | Tarefa | Resultado verificável | Dependências | Testes |
 |---|---|---|---|---|
-| MVP-05.T1 [V] | Formulário de ficha com defaults e validações | H1 completa | MVP-04.T1 | integração |
+| MVP-05.T1 [V] | Formulário de ficha com defaults e validações; `last_reviewed_at` inicializada na criação | H1 completa; data inicializada | MVP-04.T1 | integração |
 | MVP-05.T2 [V] | Página de ficha com separador visão geral | Ficha consultável | T1 | e2e mínimo |
 | MVP-05.T3 | Separadores agregados (documentos/decisões/pendências/execuções) — progressivo | Agregadas correctas | MVP-06/08/09/11 | API |
-| MVP-05.T4 | Actualização automática da data de última revisão | Campo actualiza | T1 | unitários |
+| MVP-05.T4 | Operação explícita "marcar como revisto" (actualiza `last_reviewed_at`, auditada); edição comum não a altera | H3 completa; prova negativa | T1, MVP-17.T1 | unitários + negativo |
 
 **Conclusão** — Ficha coerente e suficiente para compreender o produto (critério do macro); esforço de preenchimento curto confirmado; contribui para VAL-003 e alimenta VAL-011.
 
@@ -447,23 +450,23 @@ fluxo ponta a ponta.
 **Histórias**
 - **MVP-12.H1** — Como operador, pretendo gerar e copiar/exportar o pacote de contexto de uma execução, para o usar manualmente numa IA externa ou local.
   Pré-condições: execução Preparada. | Fluxo: gerar → pré-visualizar → copiar ou descarregar. | Resultado: pacote com as 7 secções e fontes identificadas. | Regras: conteúdo gerado a partir das versões exactas (PC-03); declaração anti-injecção presente (R-PC-01..03). | Erros: execução em estado inválido → 409. | Aceitação: pacote corresponde às versões seleccionadas; estrutura completa. | Evidência: teste de geração + comparação de conteúdo.
-- **MVP-12.H2** — Como operador, pretendo que documentos restritos sejam bloqueados ou exijam confirmação, para não expor conteúdo sensível a IA externa.
-  Pré-condições: documentos com `export_policy` variada. | Fluxo: `denied` → excluído com aviso; `confirm` → confirmação explícita; `allowed` → incluído. | Resultado: exportação controlada. | Regras: aplicado no backend (R-PC-05); geração auditada (evento 12). | Erros: tentativa de contornar via API → bloqueada. | Aceitação: os três comportamentos testados no servidor. | Evidência: testes de segurança.
+- **MVP-12.H2** — Como operador, pretendo que a `export_policy` dos documentos seja respeitada com precisão, para não expor conteúdo sensível a IA externa nem gerar pacotes incompletos.
+  Pré-condições: documentos com `export_policy` variada. | Fluxo (clarificação 5.3): ao **seleccionar** documentos para um **novo** pacote, os `denied` **não podem ser seleccionados**; `confirm` exige confirmação explícita; `allowed` normal. Ao **gerar** um pacote de uma execução cujo contexto **já referencia** um documento cuja política passou entretanto a `denied`, a **geração é bloqueada e apresenta o motivo** (o documento e a execução afectados) — **não** se exclui o documento silenciosamente nem se gera um pacote incompleto. | Resultado: exportação controlada e íntegra. | Regras: todas as verificações no backend; tentativas bloqueadas relevantes auditadas (evento 12). | Erros: tentativa de contornar via API → bloqueada e auditada. | Aceitação: os quatro comportamentos (denied na selecção; denied superveniente na geração → bloqueio com motivo; confirm; allowed) testados no servidor. | Evidência: testes de segurança.
 
 **Requisitos técnicos**
 - MVP-12.R1 — Serviço de geração a partir das versões referenciadas (nunca da versão actual), com marcadores de início/fim e fontes.
 - MVP-12.R2 — Formatos: texto/Markdown único (defeito) e ficheiros separados; sem optimização por fornecedor.
-- MVP-12.R3 — `export_policy` aplicada no servidor; aviso ao utilizador antes de exportar; registo do destino/modo.
-- MVP-12.R4 — Eventos 12 auditados; sem segredos no pacote.
+- MVP-12.R3 — `export_policy` aplicada no servidor: `denied` impede a selecção para novo pacote **e** bloqueia a geração com motivo quando já referenciado (nunca exclusão silenciosa); `confirm` exige confirmação; `allowed` normal; aviso ao utilizador; registo do destino/modo.
+- MVP-12.R4 — Eventos 12 auditados (incluindo tentativas bloqueadas); sem segredos no pacote.
 
 **Tarefas**
 | ID | Tarefa | Resultado verificável | Dependências | Testes |
 |---|---|---|---|---|
 | MVP-12.T1 [V] | Serviço de geração (7 secções, versões exactas) | Pacote fiel testado | MVP-11.T2 | integração |
 | MVP-12.T2 [V] | UI de pré-visualização/cópia/descarga | H1 completa | T1 | e2e mínimo |
-| MVP-12.T3 | Aplicação de `export_policy` + confirmação + aviso | H2 completa | T1, MVP-06.T5 | segurança |
+| MVP-12.T3 | `export_policy`: bloqueio de selecção (denied), bloqueio de geração com motivo (denied superveniente), confirmação (confirm), aviso | H2 completa | T1, MVP-06.T5 | segurança |
 | MVP-12.T4 | Exportação em ficheiros separados | Formato alternativo testado | T1 | API |
-| MVP-12.T5 | Auditoria de geração/exportação de pacote | Eventos gerados | T1, MVP-17.T1 | auditoria |
+| MVP-12.T5 | Auditoria de geração/exportação e de tentativas bloqueadas | Eventos gerados | T1, MVP-17.T1 | auditoria |
 
 **Conclusão** — Pacote corresponde às versões seleccionadas e pode ser exportado/copiado (critério macro); política de exportação comprovada; valida VAL-008 e alimenta VAL-013.
 
@@ -473,29 +476,38 @@ fluxo ponta a ponta.
 
 **Escopo** — Incluído: registar resultado (texto/Markdown colado ou ficheiro) numa execução Preparada, origem (ferramenta/modelo, modo) e notas; documento de resultado (tipo `resultado`); estado passa a Resultado por validar. Excluído: importação automática, parsing estruturado de respostas. Dependências: MVP-11, MVP-06/07. Pressupostos: conteúdo importado é não confiável (sanitizado na renderização). Decisões vigentes: DB-09; DEC-F0-FINAL-05. Reservas: nenhuma.
 
+**Nota de modelo (clarificação 5.4):** cada importação de resultado cria uma
+**tentativa (attempt) imutável**, registo **subordinado ao módulo de execução**
+(não uma entidade de negócio autónoma; não um motor genérico de workflow). A
+execução mantém um **apontador para a tentativa actual**; tentativas anteriores
+permanecem historicamente visíveis. A auditoria **não substitui** estes dados
+funcionais mínimos.
+
 **Capacidades**
-- MVP-13.C1 — Importação manual do resultado com origem, materializado como documento de resultado.
+- MVP-13.C1 — Importação manual do resultado como **tentativa imutável** com origem, materializada como documento de resultado, subordinada à execução.
 
 **Histórias**
 - **MVP-13.H1** — Como operador, pretendo colar ou anexar o resultado produzido pela IA na execução correspondente, para o manter rastreável.
-  Pré-condições: execução Preparada; resultado obtido externamente. | Fluxo: colar/anexar → origem+notas → documento de resultado criado → execução Resultado por validar. | Resultado: resultado associado à execução correcta. | Regras: importar **não** valida nem aplica (SEC-HUM); conteúdo tratado como não confiável (RT-07). | Erros: execução noutro estado → 409; tamanho excedido → 413. | Aceitação: resultado registado com origem; estado correcto; sem efeitos oficiais. | Evidência: integração + auditoria (evento 13).
-- **MVP-13.H2** — Como operador, pretendo consultar o resultado registado com o contexto que o originou, para o rever com base completa.
-  Pré-condições: resultado registado. | Fluxo: abrir execução → resultado + contexto (versões, snapshot). | Resultado: base de revisão completa. | Regras: renderização sanitizada. | Erros: — | Aceitação: detalhe completo. | Evidência: UI + testes.
+  Pré-condições: execução Preparada; resultado obtido externamente. | Fluxo: colar/anexar → origem+notas → **nova tentativa imutável** criada com documento de resultado → execução passa a Resultado por validar e aponta para esta tentativa. | Resultado: tentativa associada à execução correcta. | Regras: importar **não** valida nem aplica (SEC-HUM); conteúdo não confiável (RT-07); a tentativa é imutável após criação. | Erros: execução em estado incompatível → 409; tamanho excedido → 413. | Aceitação: tentativa registada com origem; estado e apontador correctos; sem efeitos oficiais. | Evidência: integração + auditoria (evento 13).
+- **MVP-13.H2** — Como operador, pretendo consultar a tentativa actual e as anteriores com o contexto que as originou, para as rever com base completa.
+  Pré-condições: uma ou mais tentativas registadas. | Fluxo: abrir execução → tentativa actual + histórico de tentativas + contexto (versões, snapshot). | Resultado: base de revisão completa e histórico visível. | Regras: renderização sanitizada; tentativas anteriores não são apagadas. | Erros: — | Aceitação: histórico de tentativas consultável. | Evidência: UI + testes.
 
 **Requisitos técnicos**
-- MVP-13.R1 — Resultado como documento (tipo `resultado`) referenciado pela execução; origem e modo na BD.
-- MVP-13.R2 — Registo não altera nenhum estado oficial além do estado da execução (importar ≠ aprovar).
-- MVP-13.R3 — Eventos 13 auditados.
+- MVP-13.R1 — Tentativa como registo subordinado à execução (ordem/número, origem, modo, documento de resultado do tipo `resultado`); **imutável**; a execução referencia a tentativa actual.
+- MVP-13.R2 — Registo não altera nenhum estado oficial além do estado/apontador da execução (importar ≠ aprovar).
+- MVP-13.R3 — Nova importação cria **nova** tentativa; **não** sobrescreve a anterior.
+- MVP-13.R4 — Eventos 13 auditados; a auditoria complementa, não substitui, os dados funcionais das tentativas.
 
 **Tarefas**
 | ID | Tarefa | Resultado verificável | Dependências | Testes |
 |---|---|---|---|---|
-| MVP-13.T1 [V] | API de registo do resultado (texto/ficheiro, origem) | H1 completa | MVP-11.T2, MVP-06.T2 | integração |
-| MVP-13.T2 [V] | UI de importação e detalhe do resultado | H2 completa | T1 | e2e mínimo |
+| MVP-13.T1 [V] | Registo de tentativa imutável (texto/ficheiro, origem) + apontador na execução | H1 completa | MVP-11.T2, MVP-06.T2 | integração |
+| MVP-13.T2 [V] | UI de importação, tentativa actual e histórico de tentativas | H2 completa | T1 | e2e mínimo |
 | MVP-13.T3 | Sanitização do resultado importado na renderização | XSS neutralizado | T1 | segurança |
-| MVP-13.T4 | Auditoria de importação | Eventos gerados | T1, MVP-17.T1 | auditoria |
+| MVP-13.T4 | Imutabilidade da tentativa (nova importação → nova tentativa) | Prova de não-sobrescrita | T1 | unitários + negativo |
+| MVP-13.T5 | Auditoria de importação | Eventos gerados | T1, MVP-17.T1 | auditoria |
 
-**Conclusão** — Resultado registado e associado à execução correcta (critério macro); valida VAL-009.
+**Conclusão** — Tentativa registada e associada à execução correcta, com histórico imutável (critério macro); valida VAL-009.
 
 ### MVP-14 — Revisão e aprovação de resultados
 
@@ -507,23 +519,35 @@ fluxo ponta a ponta.
 - MVP-14.C1 — Ciclo de validação humana do resultado (aprovar/rejeitar/correcção) com auditoria.
 
 **Histórias**
-- **MVP-14.H1** — Como revisor, pretendo aprovar ou rejeitar um resultado com observações, para decidir explicitamente o que se torna oficial.
-  Pré-condições: execução Resultado por validar. | Fluxo: rever conteúdo+contexto → aprovar/rejeitar com observações → estado actualizado. | Resultado: decisão de validação registada. | Regras: acção explícita; aprovar **não** aplica (SEC-HUM-02); revisor autorizado (Owner no MVP). | Erros: dupla revisão → 409; estado inválido → rejeitado. | Aceitação: nenhum estado oficial muda sem esta acção; auditoria com actor/data/decisão (eventos 14–15). | Evidência: testes de fluxo + auditoria.
-- **MVP-14.H2** — Como revisor, pretendo pedir correcção, para dar nova oportunidade sem rejeitar definitivamente.
-  Pré-condições: Resultado por validar. | Fluxo: pedir correcção com observações → execução volta a Preparada. | Resultado: novo ciclo possível no mesmo registo. | Regras: transição F0-B05 §2.6/2.7; histórico preservado. | Erros: — | Aceitação: retorno a Preparada testado; evento 16 auditado. | Evidência: testes de transição.
+**Nota de modelo (clarificação 5.4):** cada decisão de revisão incide sobre uma
+**tentativa** concreta (MVP-13) e permanece **historicamente visível**. Pedir
+correcção **não apaga nem substitui** a tentativa anterior — abre a possibilidade
+de uma nova tentativa. As revisões são registos subordinados à execução (não um
+motor de workflow).
+
+**Capacidades**
+- MVP-14.C1 — Ciclo de validação humana da tentativa (aprovar/rejeitar/correcção) com histórico de revisões e auditoria.
+
+**Histórias**
+- **MVP-14.H1** — Como revisor, pretendo aprovar ou rejeitar a tentativa actual com observações, para decidir explicitamente o que se torna oficial.
+  Pré-condições: execução Resultado por validar com tentativa actual. | Fluxo: rever tentativa+contexto → aprovar/rejeitar com observações → decisão de revisão registada sobre essa tentativa → estado actualizado. | Resultado: decisão de validação histórica. | Regras: acção explícita; aprovar **não** aplica (SEC-HUM-02); revisor autorizado (Owner no MVP); a decisão fica ligada à tentativa revista. | Erros: dupla revisão da mesma tentativa → 409; estado inválido → rejeitado. | Aceitação: nenhum estado oficial muda sem esta acção; decisão ligada à tentativa; auditoria (eventos 14–15). | Evidência: testes de fluxo + auditoria.
+- **MVP-14.H2** — Como revisor, pretendo pedir correcção, para dar nova oportunidade sem rejeitar definitivamente nem perder a tentativa anterior.
+  Pré-condições: Resultado por validar. | Fluxo: pedir correcção com observações → execução volta a Preparada → a tentativa anterior e a decisão "correcção pedida" **permanecem no histórico**; uma nova importação (MVP-13) cria nova tentativa. | Resultado: novo ciclo sem perda de histórico. | Regras: transição F0-B05 §2.6/2.7; tentativa anterior imutável e visível. | Erros: — | Aceitação: retorno a Preparada testado; tentativa e decisão anteriores continuam consultáveis; evento 16 auditado. | Evidência: testes de transição + prova de preservação.
 
 **Requisitos técnicos**
-- MVP-14.R1 — Campos de revisão na execução (revisor, data, decisão, observações) — folded conforme modelo funcional.
-- MVP-14.R2 — Autorização da operação de revisão validada no servidor (operações críticas exigem Owner — SEC-AUT-02).
-- MVP-14.R3 — Eventos 14–16 auditados.
+- MVP-14.R1 — Decisão de revisão como registo subordinado ligado à **tentativa** revista (revisor, data, decisão, observações); folded na execução, com histórico.
+- MVP-14.R2 — Pedir correcção não apaga nem substitui a tentativa nem a decisão anteriores (imutabilidade histórica).
+- MVP-14.R3 — Autorização da operação validada no servidor (operações críticas exigem Owner — SEC-AUT-02).
+- MVP-14.R4 — Eventos 14–16 auditados; auditoria não substitui os dados funcionais das revisões.
 
 **Tarefas**
 | ID | Tarefa | Resultado verificável | Dependências | Testes |
 |---|---|---|---|---|
-| MVP-14.T1 [V] | API de revisão (aprovar/rejeitar/correcção) | H1/H2 completas | MVP-13.T1 | integração |
-| MVP-14.T2 [V] | UI de caixa de validação | Revisão na UI | T1 | e2e mínimo |
+| MVP-14.T1 [V] | API de revisão (aprovar/rejeitar/correcção) ligada à tentativa | H1/H2 completas | MVP-13.T1 | integração |
+| MVP-14.T2 [V] | UI de caixa de validação com histórico de revisões | Revisão na UI | T1 | e2e mínimo |
 | MVP-14.T3 | Garantia "aprovar ≠ aplicar" (nenhuma mutação documental na aprovação) | Prova negativa testada | T1 | segurança |
-| MVP-14.T4 | Auditoria de revisão | Eventos gerados | T1, MVP-17.T1 | auditoria |
+| MVP-14.T4 | Preservação de tentativa/decisão ao pedir correcção | Prova de não-perda de histórico | T1 | unitários + negativo |
+| MVP-14.T5 | Auditoria de revisão | Eventos gerados | T1, MVP-17.T1 | auditoria |
 
 **Conclusão** — Resultado não altera estado oficial sem revisão explícita (critério macro); valida VAL-010.
 
@@ -538,24 +562,24 @@ fluxo ponta a ponta.
 - MVP-15.C2 — Aplicação controlada a decisões/pendências e fecho da execução.
 
 **Histórias**
-- **MVP-15.H1** — Como operador, pretendo aplicar um resultado aprovado a um documento criando nova versão, para oficializar a mudança com rastreabilidade.
-  Pré-condições: execução Aprovada; documento alvo. | Fluxo: escolher alvo → confirmar aplicação → nova versão criada com referência à execução → execução Concluída. | Resultado: mudança oficial rastreável. | Regras: só após aprovação (SEC-HUM-03); versão criada segue V-01/V-02; operação auditada (evento 17). | Erros: execução não aprovada → 409; conflito de versão base → 409. | Aceitação: nova versão referencia execução; estados finais correctos. | Evidência: integração + auditoria.
-- **MVP-15.H2** — Como operador, pretendo concluir pendências ou actualizar decisões a partir de um resultado aprovado, para fechar o ciclo administrativo.
-  Pré-condições: execução Aprovada. | Fluxo: aplicar a pendência (Concluída) ou decisão (actualização/substituição) → ligação à execução. | Resultado: estado administrativo actualizado. | Regras: transições válidas; SEC-HUM-04. | Erros: transição inválida → rejeitada. | Aceitação: efeitos correctos e auditados. | Evidência: testes de fluxo.
+- **MVP-15.H1** — Como operador, pretendo aplicar a **tentativa aprovada** a um documento criando nova versão, para oficializar a mudança com rastreabilidade.
+  Pré-condições: execução Aprovada com uma tentativa aprovada; documento alvo. | Fluxo: escolher alvo → confirmar aplicação → nova versão criada com referência **à execução e à tentativa aprovada específica** → execução Concluída. | Resultado: mudança oficial rastreável até à tentativa exacta. | Regras: só após aprovação (SEC-HUM-03); a aplicação **indica exactamente a tentativa aprovada** que a originou; versão segue V-01/V-02; operação auditada (evento 17). | Erros: execução não aprovada → 409; tentativa não aprovada → 409; conflito de versão base → 409. | Aceitação: nova versão referencia execução+tentativa; estados finais correctos. | Evidência: integração + auditoria.
+- **MVP-15.H2** — Como operador, pretendo concluir pendências ou actualizar decisões a partir da tentativa aprovada, para fechar o ciclo administrativo.
+  Pré-condições: execução Aprovada. | Fluxo: aplicar a pendência (Concluída) ou decisão (actualização/substituição) → ligação à execução e à tentativa aprovada. | Resultado: estado administrativo actualizado e rastreável. | Regras: transições válidas; SEC-HUM-04. | Erros: transição inválida → rejeitada. | Aceitação: efeitos correctos, ligados à tentativa, e auditados. | Evidência: testes de fluxo.
 
 **Requisitos técnicos**
-- MVP-15.R1 — Operação de aplicação como comando explícito, idempotente por execução, ligado à execução na entidade alvo.
-- MVP-15.R2 — Nenhum caminho de código permite mutação documental directa a partir de resultado não aprovado (prova por teste).
-- MVP-15.R3 — Execução → Concluída apenas após aplicação (ou fecho explícito).
+- MVP-15.R1 — Operação de aplicação como comando explícito, idempotente por execução, ligado **à execução e à tentativa aprovada** na entidade alvo.
+- MVP-15.R2 — Nenhum caminho de código permite mutação documental directa a partir de tentativa não aprovada (prova por teste).
+- MVP-15.R3 — Execução → Concluída apenas após aplicação (ou fecho explícito); a tentativa aplicada fica identificada.
 - MVP-15.R4 — Eventos 17 auditados.
 
 **Tarefas**
 | ID | Tarefa | Resultado verificável | Dependências | Testes |
 |---|---|---|---|---|
-| MVP-15.T1 [V] | Comando de aplicação a documento (nova versão + ligação) | H1 completa | MVP-14.T1, MVP-06.T2 | integração |
-| MVP-15.T2 [V] | UI de aplicação orientada | Aplicação na UI | T1 | e2e mínimo |
-| MVP-15.T3 | Aplicação a decisão/pendência | H2 completa | T1, MVP-08/09 | integração |
-| MVP-15.T4 | Prova negativa: sem aplicação sem aprovação | Teste negativo passa | T1 | segurança |
+| MVP-15.T1 [V] | Comando de aplicação a documento (nova versão + ligação à execução e à tentativa aprovada) | H1 completa | MVP-14.T1, MVP-06.T2 | integração |
+| MVP-15.T2 [V] | UI de aplicação orientada (mostra a tentativa aprovada a aplicar) | Aplicação na UI | T1 | e2e mínimo |
+| MVP-15.T3 | Aplicação a decisão/pendência com ligação à tentativa | H2 completa | T1, MVP-08/09 | integração |
+| MVP-15.T4 | Prova negativa: sem aplicação sem aprovação/tentativa aprovada | Teste negativo passa | T1 | segurança |
 | MVP-15.T5 | Auditoria de aplicação | Eventos gerados | T1, MVP-17.T1 | auditoria |
 
 **Conclusão** — Alterações aprovadas relacionadas com a execução e auditáveis (critério macro); reforça VAL-010 e VAL-004.
@@ -579,6 +603,7 @@ fluxo ponta a ponta.
 - MVP-16.R1 — Cálculo por consultas simples, sem persistência de indicadores nem "nível de atenção".
 - MVP-16.R2 — Motivos gerados a partir da regra (textos do artefacto 06), não configuráveis no MVP.
 - MVP-16.R3 — Endpoint de atenção agregado por empresa (arquitectura §10.3).
+- MVP-16.R4 — R-AT-01 ("produto sem revisão") usa `last_reviewed_at` actualizada **apenas** pela operação explícita de revisão (MVP-05.H3/R1, clarificação 5.2); edições comuns não silenciam este sinal.
 
 **Tarefas**
 | ID | Tarefa | Resultado verificável | Dependências | Testes |
@@ -667,21 +692,21 @@ fluxo ponta a ponta.
 **Histórias**
 - **MVP-19.H1** — Como Owner, pretendo exportar os meus documentos e dados essenciais, para os usar fora da aplicação.
   Pré-condições: empresa com dados. | Fluxo: pedir exportação → pacote com Markdown + dados + manifesto → descarregar. | Resultado: pacote legível fora da aplicação. | Regras: só Owner (SEC-EXP-01); sem URLs públicas permanentes (SEC-EXP-02); auditada (evento 18). | Erros: não-Owner → 403; volume excessivo → 413. | Aceitação: pacote abre e compreende-se fora da aplicação (critério macro). | Evidência: teste + inspecção do pacote.
-- **MVP-19.H2** — Como Owner, pretendo que a política documental seja respeitada na exportação, para controlar o que sai.
-  Pré-condições: documentos com `export_policy` variada. | Fluxo: exportar → `denied` excluído e assinalado; `confirm` exige confirmação. | Resultado: exportação conforme política. | Regras: aplicada no backend. | Erros: — | Aceitação: comportamentos testados. | Evidência: testes de segurança.
+- **MVP-19.H2** — Como Owner, pretendo que a `export_policy` seja respeitada na exportação de portabilidade, sem que documentos sejam omitidos silenciosamente.
+  Pré-condições: documentos com `export_policy` variada. | Fluxo (clarificação 5.3): exportar → documentos `denied` **não são incluídos, mas são listados explicitamente no manifesto com o motivo** (exclusão nunca silenciosa); `confirm` exige confirmação explícita antes da inclusão; `allowed` incluído. | Resultado: exportação conforme política e transparente sobre o que ficou de fora. | Regras: aplicada no backend; sem exportação incompleta apresentada como completa. | Erros: — | Aceitação: o manifesto declara os documentos excluídos e o motivo; confirmação para `confirm` testada. | Evidência: testes de segurança + inspecção do manifesto.
 
 **Requisitos técnicos**
 - MVP-19.R1 — Documentos exportados como ficheiros Markdown normais (sem formato proprietário — RT-06).
-- MVP-19.R2 — Manifesto simples com relações principais (produto↔documentos↔decisões↔pendências↔execuções).
-- MVP-19.R3 — `export_policy` e autorização aplicadas no servidor; evento 18 auditado.
+- MVP-19.R2 — Manifesto simples com relações principais (produto↔documentos↔decisões↔pendências↔execuções) **e a lista de documentos excluídos por `export_policy` com o motivo**.
+- MVP-19.R3 — `export_policy` e autorização aplicadas no servidor; exclusões explícitas no manifesto (não silenciosas); evento 18 auditado.
 
 **Tarefas**
 | ID | Tarefa | Resultado verificável | Dependências | Testes |
 |---|---|---|---|---|
 | MVP-19.T1 [V] | Serviço de exportação (docs+dados+manifesto) | Pacote gerado | MVP-06/08/09 | integração |
 | MVP-19.T2 [V] | UI/endpoint de exportação Owner-only | H1 completa | T1 | autorização |
-| MVP-19.T3 | Aplicação de `export_policy` na exportação | H2 completa | T1, MVP-06.T5 | segurança |
-| MVP-19.T4 | Verificação de legibilidade externa do pacote | Manifesto compreensível | T1 | demonstração |
+| MVP-19.T3 | `export_policy` na exportação: exclusão explícita no manifesto + confirmação | H2 completa | T1, MVP-06.T5 | segurança |
+| MVP-19.T4 | Verificação de legibilidade externa do pacote e do manifesto (incl. exclusões) | Manifesto compreensível | T1 | demonstração |
 | MVP-19.T5 | Auditoria de exportação | Evento gerado | T1, MVP-17.T1 | auditoria |
 
 **Conclusão** — Pacote exportado abre e compreende-se fora da aplicação (critério macro); valida VAL-013.
@@ -1008,9 +1033,12 @@ Do backlog macro + roadmap §11.2, verificáveis com evidência:
 | MVP-22 | C1–C2 | 11, DEC-03/04 | RT-10 | (evidência real de todas) |
 | MVP-23 | C1 | 11, 12 | RT-10 | (fecha a matriz) |
 
-**Totais da decomposição:** 23 itens macro; **39 capacidades**; **40 histórias
-funcionais**; **81 requisitos técnicos**; **110 tarefas de implementação**
-(das quais 40, marcadas [V], compõem o fluxo vertical mínimo).
+**Totais da decomposição:** 23 itens macro; **39 capacidades**; **41 histórias
+funcionais**; **85 requisitos técnicos**; **112 tarefas de implementação**
+(das quais as marcadas [V] compõem o fluxo vertical mínimo). Nota: as quatro
+clarificações de F1-P01-PR02 (DEC-20260712-05) acrescentaram a história de
+revisão explícita (MVP-05.H3), o modelo de tentativas imutáveis (MVP-13/14/15) e
+o comportamento preciso de `export_policy` (MVP-12/19).
 
 ## 18. Próximo passo recomendado
 
