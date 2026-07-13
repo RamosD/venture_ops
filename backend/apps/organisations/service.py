@@ -7,7 +7,7 @@ nem o `organisation_id` operacional (derivado sempre da Membership no servidor).
 from __future__ import annotations
 
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from apps.organisations.models import Membership, Organisation
 
@@ -53,12 +53,19 @@ def complete_onboarding(user, name: str) -> Organisation:
     organisation = Organisation.objects.create(
         name=name.strip(), status=Organisation.Status.ACTIVE
     )
-    Membership.objects.create(
-        user=locked_user,
-        organisation=organisation,
-        role=Membership.Role.OWNER,  # atribuído pelo serviço, não pelo cliente
-        is_active=True,
-    )
+    try:
+        # Savepoint: a constraint de "uma Membership activa por utilizador" é a
+        # garantia final de BD contra corridas; se disparar, revertemos tudo
+        # (sem Organisation órfã).
+        with transaction.atomic():
+            Membership.objects.create(
+                user=locked_user,
+                organisation=organisation,
+                role=Membership.Role.OWNER,  # atribuído pelo serviço, não pelo cliente
+                is_active=True,
+            )
+    except IntegrityError as exc:
+        raise AlreadyHasOrganisationError() from exc
     return organisation
 
 

@@ -16,6 +16,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 from apps.accounts.managers import CustomUserManager
@@ -39,6 +40,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, UUIDPrimaryKeyModel):
         db_table = "accounts_customuser"
         verbose_name = "utilizador"
         verbose_name_plural = "utilizadores"
+        constraints = [
+            # Unicidade case-insensitive ao nível da BD (defesa em profundidade
+            # além da normalização aplicacional).
+            models.UniqueConstraint(
+                Lower("email"), name="uniq_customuser_email_ci"
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.email
@@ -81,4 +89,8 @@ class RateLimitAttempt(models.Model):
 
     class Meta:
         db_table = "accounts_rate_limit_attempt"
-        indexes = [models.Index(fields=["key", "created_at"])]
+        indexes = [
+            models.Index(fields=["key", "created_at"]),
+            # Suporta a limpeza por retenção (purga por data em todas as chaves).
+            models.Index(fields=["created_at"]),
+        ]

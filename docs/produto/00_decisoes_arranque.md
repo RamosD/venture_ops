@@ -59,6 +59,14 @@ O identificador de autenticação do `CustomUser` é o **email**, **único** e
 normalizado. Não há `username` separado. Sem palavra-passe em claro; hashing
 robusto do Django. (Implementado em PR02/PR07.)
 
+**Política de normalização (PR12):** o email é normalizado por uma função única
+(`apps/accounts/normalization.py`) — **remoção de espaços exteriores + conversão
+de todo o endereço para minúsculas** (parte local *e* domínio), tornando a
+identidade **case-insensitive**. Aplica-se à criação, autenticação, recuperação e
+edição de perfil. A unicidade case-insensitive é garantida também ao nível da BD
+por uma constraint funcional `Lower(email)` (migração `accounts/0003`, com
+verificação de colisões preexistentes sem fundir/apagar contas).
+
 ## 4. Ausência de registo público irrestrito
 
 **Não** existe registo público aberto/auto-serviço no MVP. Nenhum endpoint

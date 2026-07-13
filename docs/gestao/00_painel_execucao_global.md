@@ -5,9 +5,9 @@ dos resultados; aponta para os documentos especializados.
 
 - Estado global: **Implementação iniciada** (Fase 0 concluída com reservas; governação não bloqueante — DEC-20260712-01)
 - Fase actual: **F1 — MVP**
-- Pipeline actual: F1-P02 — Fundação, autenticação e isolamento (**Concluída — 11/11**)
-- Último prompt: F1-P02-PR11 — Concluído / Não revista (contexto de empresa derivado da Membership; isolamento auditado)
-- Próximo passo: **detalhar/gerar a pipeline F1-P03** (portefólio e ficha do produto), just-in-time, a partir do estado real do repositório
+- Pipeline actual: F1-P02 — Fundação, autenticação e isolamento (**Concluída — 12/12**, com hardening)
+- Último prompt: F1-P02-PR12 — Concluído / Revista (hardening: email case-insensitive, bootstrap seguro, rate limiting atómico + retenção, concorrência de onboarding)
+- Próximo passo: **commit do hardening** e depois **detalhar/gerar a pipeline F1-P03** (portefólio e ficha do produto), just-in-time
 - Mapa das pipelines criado: `03_fase_1_mvp/02_mapa_pipelines.md` (F1-P02 detalhada; F1-P03..P08 mapeadas, just-in-time)
 - Bloqueios críticos: Nenhum
 - Decisões críticas recentes: DEC-20260712-04 (Fase 0 concluída com reservas); DEC-20260712-05 (4 clarificações de decomposição da Fase 1); DEC-20260712-06 (correcção de dependências técnicas de F1-P02: CustomUser desde a 1.ª migração, fundação User/Org/Membership em PR02, `/api/system/ping` antes dos health checks)
@@ -57,7 +57,10 @@ dos resultados; aponta para os documentos especializados.
   Parcial. **F1-P02-PR11:** contexto de empresa derivado da Membership no servidor
   (sem Membership → 403; acesso por id alheio → 404 auditado), bateria de
   isolamento com 2 empresas (8 testes); 96 testes backend + 12 frontend; VAL-002
-  e VAL-012 parciais. **Pipeline F1-P02 concluída (11/11)** — percurso vertical
-  técnico fechado. A validação humana de resultados de IA no produto permanece
-  obrigatória.
-- Última actualização: 2026-07-13 09:10
+  e VAL-012 parciais. **F1-P02-PR12 (hardening):** email case-insensitive
+  (constraint `Lower(email)`), `createinitialuser` sem palavra-passe em CLI,
+  rate limiting atómico (advisory lock) + retenção/limpeza, garantia de BD de uma
+  Membership activa por utilizador; concorrência testada (rate limit + onboarding,
+  estável); 116 testes backend + 12 frontend. **Pipeline F1-P02 concluída
+  (12/12)**. A validação humana de resultados de IA no produto permanece obrigatória.
+- Última actualização: 2026-07-13 11:20

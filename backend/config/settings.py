@@ -52,6 +52,14 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # Modelo de utilizador próprio, activo desde a primeira migração (PR02).
 AUTH_USER_MODEL = "accounts.CustomUser"
 
+# Validadores de força de palavra-passe (Django).
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
 # --- Middleware -------------------------------------------------------------
 # CorsMiddleware deve preceder CommonMiddleware. Sessão, CSRF e autenticação
 # activados em PR07.
@@ -158,5 +166,11 @@ RATE_LIMIT_LOGIN_MAX = int(get_env("RATE_LIMIT_LOGIN_MAX", default="5"))
 RATE_LIMIT_LOGIN_WINDOW = int(get_env("RATE_LIMIT_LOGIN_WINDOW", default="300"))
 RATE_LIMIT_RECOVERY_MAX = int(get_env("RATE_LIMIT_RECOVERY_MAX", default="5"))
 RATE_LIMIT_RECOVERY_WINDOW = int(get_env("RATE_LIMIT_RECOVERY_WINDOW", default="900"))
+# Retenção dos registos de rate limiting (limpeza operacional). Tem de ser
+# superior à maior janela activa (900s); default 24h para preservar histórico
+# recente sem deixar a tabela crescer indefinidamente.
+RATE_LIMIT_RETENTION_SECONDS = int(
+    get_env("RATE_LIMIT_RETENTION_SECONDS", default="86400")
+)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

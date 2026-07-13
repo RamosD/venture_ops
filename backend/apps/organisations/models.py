@@ -67,6 +67,14 @@ class Membership(UUIDPrimaryKeyModel):
                 fields=["user", "organisation"],
                 name="uniq_membership_user_organisation",
             ),
+            # Garantia da regra do MVP (uma empresa activa por conta) ao nível da
+            # BD: no máximo uma Membership activa por utilizador. Permite histórico
+            # inactivo (condição sobre is_active).
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=models.Q(is_active=True),
+                name="uniq_active_membership_per_user",
+            ),
         ]
 
     def __str__(self) -> str:

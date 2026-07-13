@@ -20,6 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts import passwords, rate_limit
+from apps.accounts.normalization import normalize_email
 from apps.audit.models import AuditAction, AuditResult
 from apps.audit.service import record_event
 
@@ -47,11 +48,12 @@ class LoginView(APIView):
 
     @method_decorator(csrf_protect)
     def post(self, request: Request) -> Response:
-        email = (request.data.get("email") or "").strip()
+        email = normalize_email(request.data.get("email"))
         password = request.data.get("password") or ""
         key = rate_limit.make_key("login", email or "unknown")
 
-        if rate_limit.is_blocked(
+        # Gate atómico (conta esta tentativa). Bloqueia sem sequer autenticar.
+        if not rate_limit.allow(
             key, settings.RATE_LIMIT_LOGIN_MAX, settings.RATE_LIMIT_LOGIN_WINDOW
         ):
             record_event(
@@ -66,14 +68,13 @@ class LoginView(APIView):
 
         user = authenticate(request, username=email, password=password)
         if user is None:
-            rate_limit.register(key, settings.RATE_LIMIT_LOGIN_WINDOW)
             record_event(action=AuditAction.AUTH_FAILED, result=AuditResult.FAILURE)
             return Response(
                 {"detail": "Credenciais inválidas."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        rate_limit.clear(key)  # sucesso limpa as falhas
+        rate_limit.clear(key)  # sucesso limpa as tentativas
         django_login(request, user)
         record_event(
             action=AuditAction.AUTH_LOGIN, actor=user, result=AuditResult.SUCCESS
@@ -113,10 +114,10 @@ class PasswordResetRequestView(APIView):
 
     @method_decorator(csrf_protect)
     def post(self, request: Request) -> Response:
-        email = (request.data.get("email") or "").strip().lower()
+        email = normalize_email(request.data.get("email"))
         key = rate_limit.make_key("recovery", email or "unknown")
 
-        if rate_limit.is_blocked(
+        if not rate_limit.allow(
             key,
             settings.RATE_LIMIT_RECOVERY_MAX,
             settings.RATE_LIMIT_RECOVERY_WINDOW,
@@ -130,7 +131,6 @@ class PasswordResetRequestView(APIView):
                 {"detail": GENERIC_RECOVERY_MESSAGE},
                 status=status.HTTP_429_TOO_MANY_REQUESTS,
             )
-        rate_limit.register(key, settings.RATE_LIMIT_RECOVERY_WINDOW)
 
         user = get_user_model().objects.filter(email__iexact=email).first()
         if user is not None:
@@ -179,7 +179,7 @@ class ProfileView(APIView):
         if name is not None:
             user.name = str(name).strip()
         if email is not None:
-            email = str(email).strip().lower()
+            email = normalize_email(email)
             if (
                 get_user_model()
                 .objects.filter(email__iexact=email)

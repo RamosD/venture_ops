@@ -77,11 +77,25 @@ dependência falha.
 
 ## Autenticação
 
-Sessão por cookie (Django Auth), sem registo público. Conta inicial criada por
-comando controlado:
+Sessão por cookie (Django Auth), sem registo público. Emails são
+case-insensitive (normalizados para minúsculas; unicidade garantida na BD).
+Conta inicial criada por comando controlado (a palavra-passe **nunca** é passada
+por argumento):
 
 ```bash
-python manage.py createinitialuser --email owner@x.pt --password "<senha>"
+# Interactivo (pede a palavra-passe por entrada oculta, com confirmação):
+python manage.py createinitialuser --email owner@x.pt
+
+# Automação controlada (lê a variável de ambiente):
+INITIAL_USER_PASSWORD='<senha-forte>' python manage.py createinitialuser --email owner@x.pt --noinput
+```
+
+Limpeza operacional dos registos de rate limiting (sem scheduler; agendar no
+ambiente do piloto):
+
+```bash
+python manage.py purge_rate_limit_attempts --dry-run   # simula
+python manage.py purge_rate_limit_attempts             # remove expirados
 ```
 
 Endpoints (`/api/v1/auth/`): `GET csrf`, `POST login`, `GET session`,
