@@ -5,9 +5,9 @@ dos resultados; aponta para os documentos especializados.
 
 - Estado global: **Implementação iniciada** (Fase 0 concluída com reservas; governação não bloqueante — DEC-20260712-01)
 - Fase actual: **F1 — MVP**
-- Pipeline actual: F1-P02 — Fundação, autenticação e isolamento (**Concluída — 12/12**, com hardening)
-- Último prompt: F1-P02-PR12 — Concluído / Revista (hardening: email case-insensitive, bootstrap seguro, rate limiting atómico + retenção, concorrência de onboarding)
-- Próximo passo: **commit do hardening** e depois **detalhar/gerar a pipeline F1-P03** (portefólio e ficha do produto), just-in-time
+- Pipeline actual: F1-P03 — Portefólio e ficha do produto (**Concluída — 6/6**)
+- Último prompt: F1-P03-PR06 — Concluído / Não revista (validação integrada e fecho: E2E ao vivo dos 21 passos, isolamento com 2 empresas, concorrência estável 3×, auditoria sem fugas, migração reversível, regressão 185 backend + 28 frontend; +8 testes de isolamento; VAL-003 Validada)
+- Próximo passo: **commit de F1-P03** e depois **gerar a pipeline F1-P04** (documentos, tipos, decisões e pendências), just-in-time
 - Mapa das pipelines criado: `03_fase_1_mvp/02_mapa_pipelines.md` (F1-P02 detalhada; F1-P03..P08 mapeadas, just-in-time)
 - Bloqueios críticos: Nenhum
 - Decisões críticas recentes: DEC-20260712-04 (Fase 0 concluída com reservas); DEC-20260712-05 (4 clarificações de decomposição da Fase 1); DEC-20260712-06 (correcção de dependências técnicas de F1-P02: CustomUser desde a 1.ª migração, fundação User/Org/Membership em PR02, `/api/system/ping` antes dos health checks)
@@ -63,4 +63,4 @@ dos resultados; aponta para os documentos especializados.
   Membership activa por utilizador; concorrência testada (rate limit + onboarding,
   estável); 116 testes backend + 12 frontend. **Pipeline F1-P02 concluída
   (12/12)**. A validação humana de resultados de IA no produto permanece obrigatória.
-- Última actualização: 2026-07-13 11:20
+- Última actualização: 2026-07-13 18:35

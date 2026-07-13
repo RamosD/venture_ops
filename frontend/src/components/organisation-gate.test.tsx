@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { AuthProvider } from "../auth/AuthContext";
 import { OrganisationGate } from "./OrganisationGate";
 
 function json(data: unknown, status = 200): Response {
@@ -8,6 +9,29 @@ function json(data: unknown, status = 200): Response {
     status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+// Respostas de autenticação/portefólio comuns: com empresa pronta, o
+// OrganisationGate passa a montar também a área de portefólio (que usa o
+// AuthContext e lista produtos). Estes handlers mantêm o teste focado na empresa.
+function authAndPortfolio(url: string): Response | null {
+  if (url.endsWith("/v1/auth/csrf")) return json({ detail: "ok" });
+  if (url.endsWith("/v1/auth/session"))
+    return json({
+      authenticated: true,
+      user: { id: "u1", email: "owner@x.pt", name: "Owner" },
+    });
+  if (url.includes("/v1/products"))
+    return json({ results: [], count: 0, page: 1, page_size: 20, num_pages: 1 });
+  return null;
+}
+
+function renderGate() {
+  return render(
+    <AuthProvider>
+      <OrganisationGate />
+    </AuthProvider>,
+  );
 }
 
 describe("OrganisationGate", () => {
@@ -33,11 +57,11 @@ describe("OrganisationGate", () => {
           hasOrg = true;
           return json({ id: "o1", name: "Minha Empresa", status: "active" }, 201);
         }
-        return json({ detail: "nf" }, 404);
+        return authAndPortfolio(url) ?? json({ detail: "nf" }, 404);
       }),
     );
 
-    render(<OrganisationGate />);
+    renderGate();
     fireEvent.change(await screen.findByLabelText("Nome da empresa"), {
       target: { value: "Minha Empresa" },
     });
@@ -58,10 +82,10 @@ describe("OrganisationGate", () => {
             onboarding_required: false,
           });
         }
-        return json({ detail: "nf" }, 404);
+        return authAndPortfolio(url) ?? json({ detail: "nf" }, 404);
       }),
     );
-    render(<OrganisationGate />);
+    renderGate();
     const nameInput = (await screen.findByLabelText(
       "Nome da empresa",
     )) as HTMLInputElement;

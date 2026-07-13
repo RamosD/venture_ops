@@ -17,3 +17,4 @@ saída da Fase 0 com reservas. **Todas as pipelines da Fase 0 estão concluídas
 | F0-P05 | F0 | Stack, piloto e fecho da Fase 0 | Concluído | Revista | 5 | 5 | 5 | 0 | — (Fase 0 concluída com reservas) |
 | F1-P01 | F1 | Planeamento e decomposição do MVP | Concluído | Não revista | 3 | 3 | 0 | 0 | Detalhar F1-P03 após execução de F1-P02 |
 | F1-P02 | F1 | Fundação, autenticação e isolamento | Concluído | Revista | 12 | 12 | 1 | 0 | — (detalhar F1-P03) |
+| F1-P03 | F1 | Portefólio e ficha do produto | Concluído | Não revista | 6 | 6 | 0 | 0 | — (commit de F1-P03; gerar F1-P04) |

@@ -7,6 +7,7 @@ import {
   updateOrganisation,
   type Organisation,
 } from "../api/organisation";
+import { PortfolioWorkspace } from "./portfolio/PortfolioWorkspace";
 
 type GateState =
   | { kind: "loading" }
@@ -38,7 +39,13 @@ export function OrganisationGate() {
   if (error) return <p role="alert">{error}</p>;
   if (state.kind === "loading") return <p role="status">A carregar empresa…</p>;
   if (state.kind === "onboarding") return <OnboardingForm onDone={load} />;
-  return <OrganisationPanel organisation={state.organisation} onUpdated={load} />;
+  // Com empresa: painel da empresa + área de portefólio (depois do onboarding).
+  return (
+    <>
+      <OrganisationPanel organisation={state.organisation} onUpdated={load} />
+      <PortfolioWorkspace />
+    </>
+  );
 }
 
 function OnboardingForm({ onDone }: { onDone: () => void }) {
