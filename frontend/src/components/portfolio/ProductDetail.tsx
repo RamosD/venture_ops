@@ -8,6 +8,9 @@ import {
   reactivateProduct,
   type Product,
 } from "../../api/products";
+import { DecisionSection } from "../decisions/DecisionSection";
+import { DocumentSection } from "../documents/DocumentSection";
+import { WorkItemSection } from "../workitems/WorkItemSection";
 import { formatDate, responsibleLabel, statusLabel } from "./format";
 
 interface Props {
@@ -205,13 +208,14 @@ export function ProductDetail({
         </button>
       </div>
 
-      {/* Vistas agregadas progressivas: estrutura reservada, sem dados simulados. */}
+      {/* Contexto relacionado: documentos (PR03), decisões (PR04) e pendências
+          (PR05) reais. Execuções permanecem indisponíveis até F1-P05. */}
       <section aria-labelledby="product-related-title">
         <h4 id="product-related-title">Contexto relacionado</h4>
-        <p>
-          Documentos, decisões, pendências e execuções ainda não estão
-          disponíveis nesta versão.
-        </p>
+        <DocumentSection productId={product.id} />
+        <DecisionSection productId={product.id} />
+        <WorkItemSection productId={product.id} />
+        <p>Execuções ainda não estão disponíveis nesta versão.</p>
       </section>
     </section>
   );

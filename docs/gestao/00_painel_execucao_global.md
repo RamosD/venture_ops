@@ -5,9 +5,9 @@ dos resultados; aponta para os documentos especializados.
 
 - Estado global: **Implementação iniciada** (Fase 0 concluída com reservas; governação não bloqueante — DEC-20260712-01)
 - Fase actual: **F1 — MVP**
-- Pipeline actual: F1-P03 — Portefólio e ficha do produto (**Concluída — 6/6**)
-- Último prompt: F1-P03-PR06 — Concluído / Não revista (validação integrada e fecho: E2E ao vivo dos 21 passos, isolamento com 2 empresas, concorrência estável 3×, auditoria sem fugas, migração reversível, regressão 185 backend + 28 frontend; +8 testes de isolamento; VAL-003 Validada)
-- Próximo passo: **commit de F1-P03** e depois **gerar a pipeline F1-P04** (documentos, tipos, decisões e pendências), just-in-time
+- Pipeline actual: F1-P04 — Documentos, tipos, decisões e pendências (**Concluída — 6/6**)
+- Último prompt: F1-P04-PR06 — Concluído / Não revista (validação integrada e fecho: E2E ao vivo dos três módulos na ficha, preview XSS neutralizada, cadeia de decisão, 5 pendências/transições; regressão 293 backend + 49 frontend + build; concorrência estável 3×; checksums coincidentes e `current_version` sem órfãos; auditoria com `correlation_id` e 0 fugas de conteúdo; drift zero; sem defeitos — nenhuma correcção de código; VAL-004/005/006 Validadas)
+- Próximo passo: **commit de F1-P04** e depois **gerar a pipeline F1-P05** (funções, execuções e pacote de contexto), just-in-time
 - Mapa das pipelines criado: `03_fase_1_mvp/02_mapa_pipelines.md` (F1-P02 detalhada; F1-P03..P08 mapeadas, just-in-time)
 - Bloqueios críticos: Nenhum
 - Decisões críticas recentes: DEC-20260712-04 (Fase 0 concluída com reservas); DEC-20260712-05 (4 clarificações de decomposição da Fase 1); DEC-20260712-06 (correcção de dependências técnicas de F1-P02: CustomUser desde a 1.ª migração, fundação User/Org/Membership em PR02, `/api/system/ping` antes dos health checks)
@@ -63,4 +63,4 @@ dos resultados; aponta para os documentos especializados.
   Membership activa por utilizador; concorrência testada (rate limit + onboarding,
   estável); 116 testes backend + 12 frontend. **Pipeline F1-P02 concluída
   (12/12)**. A validação humana de resultados de IA no produto permanece obrigatória.
-- Última actualização: 2026-07-13 18:35
+- Última actualização: 2026-07-14 10:35

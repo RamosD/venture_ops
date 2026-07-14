@@ -13,6 +13,9 @@ urlpatterns = [
     path("api/v1/auth/", include("apps.accounts.urls")),
     path("api/v1/", include("apps.organisations.urls")),
     path("api/v1/", include("apps.portfolio.urls")),
+    path("api/v1/", include("apps.documents.urls")),
+    path("api/v1/", include("apps.decisions.urls")),
+    path("api/v1/", include("apps.work_items.urls")),
     path("api/v1/profile", ProfileView.as_view(), name="profile"),
     # Health checks técnicos (distintos do smoke /api/system/ping).
     path("health/live", HealthLiveView.as_view(), name="health-live"),

@@ -60,6 +60,24 @@ function installFetch(state: MockState) {
     if (path.endsWith("/v1/auth/session"))
       return json({ authenticated: !!state.user, user: state.user ?? undefined });
 
+    // A ficha do produto compõe a área documental (F1-P04-PR03): responde com
+    // uma lista vazia para que abrir a ficha não gere erro nos testes do
+    // portefólio (o comportamento documental é testado em documents.test.tsx).
+    if (
+      (path.endsWith("/v1/documents") ||
+        path.endsWith("/v1/decisions") ||
+        path.endsWith("/v1/work-items")) &&
+      method === "GET"
+    ) {
+      return json({
+        results: [],
+        count: 0,
+        page: 1,
+        page_size: 20,
+        num_pages: 1,
+      });
+    }
+
     if (path.endsWith("/v1/products") && method === "GET") {
       const status = url.searchParams.get("status") ?? "active";
       const responsible = url.searchParams.get("responsible");

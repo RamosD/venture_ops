@@ -143,6 +143,9 @@ CORS_ALLOW_CREDENTIALS = True
 # servidor; sem rota que sirva objectos directamente. S3 não é implementado.
 STORAGE_ROOT = get_env("STORAGE_ROOT", default=str(BASE_DIR / "var" / "storage"))
 STORAGE_MAX_BYTES = int(get_env("STORAGE_MAX_BYTES", default=str(25 * 1024 * 1024)))
+# Limite de bytes do conteúdo documental (UTF-8). Excedido → 413. Por defeito
+# alinhado com o limite do armazenamento; configurável por ambiente e nos testes.
+DOCUMENT_MAX_BYTES = int(get_env("DOCUMENT_MAX_BYTES", default=str(STORAGE_MAX_BYTES)))
 
 # --- Correio (consola em dev; configurável para SMTP real no piloto) --------
 EMAIL_BACKEND = get_env(
