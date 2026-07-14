@@ -140,6 +140,22 @@ class DocumentListCreateView(APIView):
                 )
             documents = documents.filter(product_id=product)
 
+        # Filtro de leitura de documentos empresariais (sem produto) — usado pela
+        # selecção de contexto de execução (F1-P05). `empresarial=true` devolve
+        # apenas documentos ao nível da empresa (product NULL).
+        empresarial = request.query_params.get("empresarial")
+        if empresarial is not None:
+            low = empresarial.lower()
+            if low in ("true", "1"):
+                documents = documents.filter(product__isnull=True)
+            elif low in ("false", "0"):
+                documents = documents.filter(product__isnull=False)
+            else:
+                return Response(
+                    {"empresarial": "Use true ou false."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         # Ordenação estável e determinística.
         documents = documents.order_by("-updated_at", "id")
 

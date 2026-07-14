@@ -45,6 +45,7 @@ export interface DocumentDetail extends DocumentSummary {
 
 // Metadados imutáveis de uma versão (histórico; sem conteúdo).
 export interface DocumentVersionSummary {
+  id: string; // UUID exacto da versão (referenciável, ex.: contexto de execução)
   version_number: number;
   checksum: string;
   byte_size: number;
@@ -72,6 +73,9 @@ export interface DocumentVersionListResponse {
 
 export interface DocumentListParams {
   product?: string;
+  // Documentos empresariais (sem produto) — usado pela selecção de contexto de
+  // execução. `true` devolve só documentos ao nível da empresa (product null).
+  empresarial?: boolean;
   document_type?: DocumentType;
   is_outdated?: boolean;
   export_policy?: ExportPolicy;
@@ -108,6 +112,8 @@ export const listDocuments = (
 ): Promise<DocumentListResponse> => {
   const query = new URLSearchParams();
   if (params.product) query.set("product", params.product);
+  if (params.empresarial !== undefined)
+    query.set("empresarial", String(params.empresarial));
   if (params.document_type) query.set("document_type", params.document_type);
   if (params.is_outdated !== undefined)
     query.set("is_outdated", String(params.is_outdated));

@@ -14,8 +14,11 @@ Base: `01_backlog.md` (MVP-01..23, capacidades, tarefas, RT, VAL); §15 do backl
 | Pipeline | Estado | Prompts |
 |---|---|---|
 | F1-P02 | **Concluída (11/11)** | Executados (ver `pipelines/02_.../resultados_execucao/`) |
-| F1-P03 | Mapeada — **próxima a detalhar** (just-in-time) | A gerar a partir do estado real do repositório |
-| F1-P04 a F1-P08 | Mapeadas (sem prompts completos) | A gerar após a pipeline anterior |
+| F1-P03 | **Concluída** | Executados (ver `pipelines/03_.../resultados_execucao/`) |
+| F1-P04 | **Concluída (6/6)** | Executados (ver `pipelines/04_.../resultados_execucao/`) |
+| F1-P05 | **Concluída (6/6)** | Executados (ver `pipelines/05_.../resultados_execucao/`) |
+| F1-P06 | Mapeada — **próxima a detalhar** (just-in-time) | A gerar a partir do estado real do repositório |
+| F1-P07 a F1-P08 | Mapeadas (sem prompts completos) | A gerar após a pipeline anterior |
 
 Ordem recomendada: F1-P02 → P03 → P04 → P05 → P06 → P07 → P08. MVP-20.T1
 (selecção da plataforma) e MVP-18.T1 (isolamento) podem antecipar-se em paralelo.

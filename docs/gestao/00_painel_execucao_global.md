@@ -5,9 +5,9 @@ dos resultados; aponta para os documentos especializados.
 
 - Estado global: **Implementação iniciada** (Fase 0 concluída com reservas; governação não bloqueante — DEC-20260712-01)
 - Fase actual: **F1 — MVP**
-- Pipeline actual: F1-P04 — Documentos, tipos, decisões e pendências (**Concluída — 6/6**)
-- Último prompt: F1-P04-PR06 — Concluído / Não revista (validação integrada e fecho: E2E ao vivo dos três módulos na ficha, preview XSS neutralizada, cadeia de decisão, 5 pendências/transições; regressão 293 backend + 49 frontend + build; concorrência estável 3×; checksums coincidentes e `current_version` sem órfãos; auditoria com `correlation_id` e 0 fugas de conteúdo; drift zero; sem defeitos — nenhuma correcção de código; VAL-004/005/006 Validadas)
-- Próximo passo: **commit de F1-P04** e depois **gerar a pipeline F1-P05** (funções, execuções e pacote de contexto), just-in-time
+- Pipeline actual: F1-P05 — Funções, execuções e pacote de contexto (**Concluída — 6/6**)
+- Último prompt: F1-P05-PR06 — Concluído / Não revista (validação integrada e fecho: E2E ao vivo do cenário — função IA com instruções `confirm`, execução `prepared` com A/B, C `denied` não seleccionável, snapshots congelados perante edições, versões v1 preservadas após v2, bloqueio→confirmação, Markdown/ZIP determinísticos com 7 secções/manifesto/checksum, hostil em DADOS, política superveniente `denied`→409→`allowed`; concorrência real — gerações simultâneas idênticas e alteração de política concorrente coerente sem pacote parcial; isolamento com 2 empresas; auditoria com correlation_id sem conteúdo; migrações sem drift aplicadas em base vazia e na base de dev existente; regressão 396 backend + 91 frontend + build; health live/ready 200; Docker healthy; nenhum defeito — nenhuma correcção de código; nenhuma IA chamada, nenhum resultado criado, execuções permanecem `prepared`; **VAL-007 e VAL-008 Validadas**; VAL-002/VAL-012/VAL-014 Parciais; VAL-009 não validável sem resultados)
+- Próximo passo: **commit de F1-P05** e depois **gerar a pipeline F1-P06** (resultados, revisão e aplicação controlada), just-in-time
 - Mapa das pipelines criado: `03_fase_1_mvp/02_mapa_pipelines.md` (F1-P02 detalhada; F1-P03..P08 mapeadas, just-in-time)
 - Bloqueios críticos: Nenhum
 - Decisões críticas recentes: DEC-20260712-04 (Fase 0 concluída com reservas); DEC-20260712-05 (4 clarificações de decomposição da Fase 1); DEC-20260712-06 (correcção de dependências técnicas de F1-P02: CustomUser desde a 1.ª migração, fundação User/Org/Membership em PR02, `/api/system/ping` antes dos health checks)
@@ -63,4 +63,38 @@ dos resultados; aponta para os documentos especializados.
   Membership activa por utilizador; concorrência testada (rate limit + onboarding,
   estável); 116 testes backend + 12 frontend. **Pipeline F1-P02 concluída
   (12/12)**. A validação humana de resultados de IA no produto permanece obrigatória.
-- Última actualização: 2026-07-14 10:35
+- **Pipeline F1-P05 (funções, execuções, pacote de contexto) — em execução (1/6).
+  F1-P05-PR01:** módulo `functions` novo (`FunctionProfile`, serviço, API,
+  serializers estritos, migração `0001`), área empresarial **Funções** na UI
+  (lista/filtros/criação/edição/inactivação com confirmação/reactivação), sem
+  novo router; nenhum módulo anterior alterado (só routing acrescentado); 31 novos
+  testes backend + 8 frontend; regressão 324 backend + 57 frontend verde.
+- **F1-P05-PR02:** módulo `executions` (`AIExecution` + `ExecutionContextDocument`,
+  `transitions.py`, serviço, API, serializers estritos, migração `0001`);
+  execuções `prepared` criáveis com snapshots imutáveis e versões documentais
+  exactas; sem UI (F1-P05-PR03); nenhum módulo anterior alterado (só routing
+  acrescentado); 41 novos testes backend; regressão 365 backend + 57 frontend.
+- **F1-P05-PR03:** UI de execuções (`ExecutionSection`/`ExecutionList`/
+  `ExecutionCreateForm`/`ContextDocumentSelector`/`FunctionSnapshotView`/
+  `ExecutionDetail`) integrada na ficha do produto (substitui o aviso de
+  indisponibilidade; mantém documentos/decisões/pendências); duas adições de
+  leitura aditivas ao módulo documental (filtro `empresarial`, `id` de versão);
+  16 novos testes frontend; regressão 365 backend + 73 frontend + build.
+- **F1-P05-PR04:** serviço `context_package.py` + endpoints
+  `context-package/preview` e `context-package/download` (geração determinística,
+  `export_policy` no servidor, `single_markdown`/ZIP, checksum SHA-256, evento 12);
+  definição `CONTEXT_PACKAGE_MAX_BYTES`; nenhum módulo anterior alterado; 27 novos
+  testes backend; regressão 392 backend + 73 frontend; sem drift.
+- **F1-P05-PR05:** UI do pacote (`ContextPackagePanel` no `ExecutionDetail`;
+  análise de política, confirmação, preview de texto não executável, cópia via
+  Clipboard, descarga `.md`/`.zip` com revogação de URL); auxiliares
+  `apiPostWithStatus`/`apiPostBlob` no cliente central; handoff manual simulado
+  nos testes (sem IA, execuções ficam `prepared`); 18 novos testes; regressão
+  392 backend + 91 frontend + build.
+- **F1-P05-PR06 (fecho):** validação integrada ponta a ponta + concorrência da
+  geração (2 gerações simultâneas idênticas; alteração de política concorrente
+  coerente); +4 testes backend (integração + concorrência); regressão 396 backend
+  + 91 frontend + build; migrações aplicadas na base de dev existente sem drift;
+  nenhum defeito — nenhuma correcção de código. **F1-P05 Concluída (6/6);
+  VAL-007/VAL-008 Validadas.**
+- Última actualização: 2026-07-14 08:00

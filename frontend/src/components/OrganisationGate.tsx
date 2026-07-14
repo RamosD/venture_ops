@@ -7,6 +7,7 @@ import {
   updateOrganisation,
   type Organisation,
 } from "../api/organisation";
+import { FunctionsWorkspace } from "./functions/FunctionsWorkspace";
 import { PortfolioWorkspace } from "./portfolio/PortfolioWorkspace";
 
 type GateState =
@@ -44,6 +45,7 @@ export function OrganisationGate() {
     <>
       <OrganisationPanel organisation={state.organisation} onUpdated={load} />
       <PortfolioWorkspace />
+      <FunctionsWorkspace />
     </>
   );
 }

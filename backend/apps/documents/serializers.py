@@ -66,13 +66,18 @@ class DocumentDetailSerializer(DocumentReadSerializer):
 
 
 class DocumentVersionSerializer(serializers.ModelSerializer):
-    """Metadados imutáveis de uma versão (sem conteúdo)."""
+    """Metadados imutáveis de uma versão (sem conteúdo).
+
+    Expõe o `id` (UUID da versão) — identificador exacto e imutável consumido por
+    quem referencia uma versão específica (ex.: contexto de execução, F1-P05).
+    """
 
     author = serializers.UUIDField(source="author_id", read_only=True)
 
     class Meta:
         model = DocumentVersion
         fields = (
+            "id",
             "version_number",
             "checksum",
             "byte_size",

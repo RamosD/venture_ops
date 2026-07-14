@@ -146,6 +146,12 @@ STORAGE_MAX_BYTES = int(get_env("STORAGE_MAX_BYTES", default=str(25 * 1024 * 102
 # Limite de bytes do conteúdo documental (UTF-8). Excedido → 413. Por defeito
 # alinhado com o limite do armazenamento; configurável por ambiente e nos testes.
 DOCUMENT_MAX_BYTES = int(get_env("DOCUMENT_MAX_BYTES", default=str(STORAGE_MAX_BYTES)))
+# Limite de bytes do pacote de contexto gerado (Markdown único ou ZIP). Excedido
+# → 413, antes de devolver qualquer conteúdo (nunca pacote parcial). Configurável
+# por ambiente e nos testes.
+CONTEXT_PACKAGE_MAX_BYTES = int(
+    get_env("CONTEXT_PACKAGE_MAX_BYTES", default=str(STORAGE_MAX_BYTES))
+)
 
 # --- Correio (consola em dev; configurável para SMTP real no piloto) --------
 EMAIL_BACKEND = get_env(

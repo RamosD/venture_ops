@@ -16,6 +16,8 @@ urlpatterns = [
     path("api/v1/", include("apps.documents.urls")),
     path("api/v1/", include("apps.decisions.urls")),
     path("api/v1/", include("apps.work_items.urls")),
+    path("api/v1/", include("apps.functions.urls")),
+    path("api/v1/", include("apps.executions.urls")),
     path("api/v1/profile", ProfileView.as_view(), name="profile"),
     # Health checks técnicos (distintos do smoke /api/system/ping).
     path("health/live", HealthLiveView.as_view(), name="health-live"),

@@ -66,7 +66,9 @@ function installFetch(state: MockState) {
     if (
       (path.endsWith("/v1/documents") ||
         path.endsWith("/v1/decisions") ||
-        path.endsWith("/v1/work-items")) &&
+        path.endsWith("/v1/work-items") ||
+        path.endsWith("/v1/executions") ||
+        path.endsWith("/v1/functions")) &&
       method === "GET"
     ) {
       return json({
@@ -506,9 +508,11 @@ describe("PortfolioWorkspace (experiência completa)", () => {
     });
     renderWorkspace();
     await openDetail("Alpha");
+    // As quatro áreas relacionadas são reais (execuções agora incluídas).
     expect(
-      screen.getByText(/ainda não estão disponíveis nesta versão/i),
+      screen.getByRole("heading", { name: "Execuções", level: 4 }),
     ).toBeInTheDocument();
+    await screen.findByText(/ainda não há execuções/i);
     // Sem contagens simuladas do tipo "Documentos (0)".
     expect(screen.queryByText(/\(\d+\)/)).toBeNull();
   });

@@ -97,6 +97,76 @@ export function apiPost<T>(path: string, body?: unknown): Promise<T> {
   return execute<T>("POST", path, body);
 }
 
+// POST que NÃO lança em respostas de negócio esperadas (ex.: 409 do pacote de
+// contexto, cujo corpo transporta a análise de política). Devolve estado + corpo;
+// só lança `ApiError` em falha de comunicação. O chamador decide pelo estado.
+export async function apiPostWithStatus<T>(
+  path: string,
+  body?: unknown,
+): Promise<{ status: number; data: T }> {
+  const url = `${API_BASE_URL}${path}`;
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+  const token = getCookie("csrftoken");
+  if (token) headers["X-CSRFToken"] = token;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers,
+      credentials: "same-origin",
+      body: JSON.stringify(body ?? {}),
+    });
+  } catch {
+    throw new ApiError("Falha de comunicação com o servidor.");
+  }
+  if (response.status === 401 || response.status === 403) {
+    unauthorizedHandler?.();
+  }
+  const data =
+    response.status === 204 ? (undefined as T) : ((await response.json()) as T);
+  return { status: response.status, data };
+}
+
+// POST que devolve um binário (descarga do pacote). Lê o nome do ficheiro do
+// Content-Disposition (gerado/validado pelo servidor) e o checksum do header.
+export async function apiPostBlob(
+  path: string,
+  body?: unknown,
+): Promise<{ blob: Blob; filename: string; checksum: string }> {
+  const url = `${API_BASE_URL}${path}`;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const token = getCookie("csrftoken");
+  if (token) headers["X-CSRFToken"] = token;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers,
+      credentials: "same-origin",
+      body: JSON.stringify(body ?? {}),
+    });
+  } catch {
+    throw new ApiError("Falha de comunicação com o servidor.");
+  }
+  if (response.status === 401 || response.status === 403) {
+    unauthorizedHandler?.();
+  }
+  if (!response.ok) {
+    throw new ApiError(mensagemDeErro(response.status), response.status);
+  }
+  const blob = await response.blob();
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const match = disposition.match(/filename="([^"]+)"/);
+  const filename = match ? match[1] : "pacote-contexto";
+  const checksum = response.headers.get("X-Package-Checksum") ?? "";
+  return { blob, filename, checksum };
+}
+
 export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
   return execute<T>("PATCH", path, body);
 }

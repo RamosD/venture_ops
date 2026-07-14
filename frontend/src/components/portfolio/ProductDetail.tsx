@@ -10,6 +10,7 @@ import {
 } from "../../api/products";
 import { DecisionSection } from "../decisions/DecisionSection";
 import { DocumentSection } from "../documents/DocumentSection";
+import { ExecutionSection } from "../executions/ExecutionSection";
 import { WorkItemSection } from "../workitems/WorkItemSection";
 import { formatDate, responsibleLabel, statusLabel } from "./format";
 
@@ -208,14 +209,14 @@ export function ProductDetail({
         </button>
       </div>
 
-      {/* Contexto relacionado: documentos (PR03), decisões (PR04) e pendências
-          (PR05) reais. Execuções permanecem indisponíveis até F1-P05. */}
+      {/* Contexto relacionado: documentos, decisões, pendências e execuções
+          reais (execuções: F1-P05-PR03). */}
       <section aria-labelledby="product-related-title">
         <h4 id="product-related-title">Contexto relacionado</h4>
         <DocumentSection productId={product.id} />
         <DecisionSection productId={product.id} />
         <WorkItemSection productId={product.id} />
-        <p>Execuções ainda não estão disponíveis nesta versão.</p>
+        <ExecutionSection productId={product.id} />
       </section>
     </section>
   );
