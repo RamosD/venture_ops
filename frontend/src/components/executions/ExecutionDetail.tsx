@@ -1,7 +1,15 @@
-import type { ExecutionDetail as Execution } from "../../api/executions";
+import { useCallback, useEffect, useState } from "react";
+
+import {
+  getExecution,
+  type ExecutionDetail as Execution,
+} from "../../api/executions";
 import { documentTypeLabel } from "../documents/labels";
+import { ApplicationPanel } from "./ApplicationPanel";
 import { ContextPackagePanel } from "./ContextPackagePanel";
 import { FunctionSnapshotView } from "./FunctionSnapshotView";
+import { ResultAttemptsPanel } from "./ResultAttemptsPanel";
+import { ValidationPanel } from "./ValidationPanel";
 import {
   abbrevChecksum,
   executionModeLabel,
@@ -16,8 +24,20 @@ interface Props {
 // Detalhe da execução: metadados do pedido + contexto CONGELADO (snapshots e
 // versões documentais exactas). Não há edição, eliminação nem transições de
 // estado nesta etapa — apenas leitura. Distingue claramente o snapshot (retrato
-// no momento da criação) dos marcadores actuais dos documentos.
-export function ExecutionDetail({ execution, onBack }: Props) {
+// no momento da criação) dos marcadores actuais dos documentos. Mantém uma cópia
+// local da execução, actualizável após a importação de um resultado.
+export function ExecutionDetail({ execution: initial, onBack }: Props) {
+  const [execution, setExecution] = useState<Execution>(initial);
+  useEffect(() => setExecution(initial), [initial]);
+
+  const reload = useCallback(async () => {
+    try {
+      setExecution(await getExecution(initial.id));
+    } catch {
+      /* mantém o estado anterior se a recarga falhar */
+    }
+  }, [initial.id]);
+
   const snap = execution.product_snapshot;
   return (
     <section aria-labelledby="execution-detail-title">
@@ -121,6 +141,17 @@ export function ExecutionDetail({ execution, onBack }: Props) {
           O pacote de contexto só pode ser preparado enquanto a execução está no
           estado <strong>Preparada</strong>.
         </p>
+      )}
+
+      {/* Resultados por estado: `result_pending_validation` → revisão humana;
+          `approved` → aplicação controlada (nova versão documental); restantes →
+          importação (em `prepared`) e histórico em leitura. */}
+      {execution.status === "result_pending_validation" ? (
+        <ValidationPanel execution={execution} onReload={reload} />
+      ) : execution.status === "approved" ? (
+        <ApplicationPanel execution={execution} onReload={reload} />
+      ) : (
+        <ResultAttemptsPanel execution={execution} onReload={reload} />
       )}
 
       <p>

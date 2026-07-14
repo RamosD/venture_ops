@@ -17,13 +17,13 @@ Base: `01_backlog.md` (MVP-01..23, capacidades, tarefas, RT, VAL); §15 do backl
 | F1-P03 | **Concluída** | Executados (ver `pipelines/03_.../resultados_execucao/`) |
 | F1-P04 | **Concluída (6/6)** | Executados (ver `pipelines/04_.../resultados_execucao/`) |
 | F1-P05 | **Concluída (6/6)** | Executados (ver `pipelines/05_.../resultados_execucao/`) |
-| F1-P06 | Mapeada — **próxima a detalhar** (just-in-time) | A gerar a partir do estado real do repositório |
+| F1-P06 | **Concluída (6/6)** | PR01–PR06 executados (`pipelines/06_.../resultados_execucao/`); validação E2E + regressão + M1 atingido |
 | F1-P07 a F1-P08 | Mapeadas (sem prompts completos) | A gerar após a pipeline anterior |
 
 Ordem recomendada: F1-P02 → P03 → P04 → P05 → P06 → P07 → P08. MVP-20.T1
 (selecção da plataforma) e MVP-18.T1 (isolamento) podem antecipar-se em paralelo.
 
-Marcos: **M1** fluxo vertical ponta a ponta (fim de F1-P06); **M2** segurança e
+Marcos: **M1 — ATINGIDO** (fluxo vertical ponta a ponta, fim de F1-P06, 2026-07-14); **M2** segurança e
 testes consolidados (F1-P07); **M3** ambiente de piloto (F1-P08); **M4** piloto
 concluído; **M5** decisão formal.
 

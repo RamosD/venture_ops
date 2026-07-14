@@ -8,3 +8,15 @@ class ExecutionContextImmutableError(Exception):
 
 class InvalidExecutionTransition(Exception):
     """Transição de estado fora da matriz oficial (política central)."""
+
+
+class ResultAttemptImmutableError(Exception):
+    """Uma tentativa de resultado é append-only (não se actualiza nem apaga)."""
+
+
+class ResultReviewImmutableError(Exception):
+    """Uma revisão de resultado é append-only (não se actualiza nem apaga)."""
+
+
+class ResultApplicationImmutableError(Exception):
+    """Uma aplicação de resultado é append-only (não se actualiza nem apaga)."""

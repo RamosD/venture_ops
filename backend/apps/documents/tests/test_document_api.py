@@ -311,7 +311,11 @@ class DocumentApiTests(TestCase):
         self._create(
             self.client_a, document_type="visao_de_produto", product=str(product.pk)
         )
-        self._create(self.client_a, document_type="resultado", export_policy="denied")
+        # `decisao_detalhada` (a API genérica já não cria `resultado`, que passa a
+        # ser gerido pela importação de resultado — F1-P06-PR01).
+        self._create(
+            self.client_a, document_type="decisao_detalhada", export_policy="denied"
+        )
 
         # tipo
         r = self.client_a.get(f"{DOCS}?document_type=visao_de_produto").json()

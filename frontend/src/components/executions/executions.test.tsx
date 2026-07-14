@@ -146,6 +146,11 @@ function installFetch(state: State) {
       return json({ results: state.versions[vm[1]] ?? [], count: 0 });
     }
 
+    // Tentativas de resultado (F1-P06): lista vazia por defeito nestes testes.
+    if (path.match(/\/result-attempts$/) && method === "GET") {
+      return json({ results: [] });
+    }
+
     // Execuções: lista por produto.
     if (path.endsWith("/v1/executions") && method === "GET") {
       const product = url.searchParams.get("product");

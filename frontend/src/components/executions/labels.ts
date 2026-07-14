@@ -24,6 +24,24 @@ export const EXPORT_POLICY_LABELS: Record<string, string> = {
 export const exportPolicyLabel = (p: string): string =>
   EXPORT_POLICY_LABELS[p] ?? p;
 
+export const SOURCE_MODE_LABELS: Record<string, string> = {
+  pasted: "Colado",
+  file: "Ficheiro",
+};
+
+export const sourceModeLabel = (m: string): string =>
+  SOURCE_MODE_LABELS[m] ?? m;
+
+// Rótulos das decisões de revisão humana (MVP-14).
+export const REVIEW_DECISION_LABELS: Record<string, string> = {
+  approved: "Aprovado",
+  rejected: "Rejeitado",
+  correction_requested: "Correcção pedida",
+};
+
+export const reviewDecisionLabel = (d: string): string =>
+  REVIEW_DECISION_LABELS[d] ?? d;
+
 export const executionModeLabel = (m: string): string =>
   (EXECUTION_MODE_LABELS as Record<string, string>)[m] ?? m;
 export const executionStatusLabel = (s: string): string =>

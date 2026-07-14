@@ -12,7 +12,12 @@ from __future__ import annotations
 
 from rest_framework import serializers
 
-from apps.executions.models import AIExecution
+from apps.executions.models import (
+    AIExecution,
+    ResultApplication,
+    ResultAttempt,
+    ResultReview,
+)
 
 
 class ExecutionListSerializer(serializers.ModelSerializer):
@@ -215,3 +220,187 @@ class ContextPackageRequestSerializer(_StrictInputSerializer):
     allowed_fields = frozenset(
         {"format", "confirmed_document_ids", "operation", "destination_label"}
     )
+
+
+class ResultAttemptReadSerializer(serializers.ModelSerializer):
+    """Metadados de uma tentativa (sem conteúdo integral nem chaves de storage)."""
+
+    organisation = serializers.UUIDField(source="organisation_id", read_only=True)
+    execution = serializers.UUIDField(source="execution_id", read_only=True)
+    imported_by = serializers.UUIDField(source="imported_by_id", read_only=True)
+    document = serializers.SerializerMethodField()
+    document_version = serializers.UUIDField(
+        source="result_document_version_id", read_only=True
+    )
+    version_number = serializers.SerializerMethodField()
+    checksum = serializers.SerializerMethodField()
+    byte_size = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ResultAttempt
+        fields = (
+            "id",
+            "organisation",
+            "execution",
+            "attempt_number",
+            "source_mode",
+            "source_tool",
+            "source_model",
+            "source_notes",
+            "imported_by",
+            "document",
+            "document_version",
+            "version_number",
+            "checksum",
+            "byte_size",
+            "created_at",
+        )
+        read_only_fields = fields
+
+    def get_document(self, obj) -> str:
+        return str(obj.result_document_version.document_id)
+
+    def get_version_number(self, obj) -> int:
+        return obj.result_document_version.version_number
+
+    def get_checksum(self, obj) -> str:
+        return obj.result_document_version.checksum
+
+    def get_byte_size(self, obj) -> int:
+        return obj.result_document_version.byte_size
+
+
+class ResultAttemptDetailSerializer(ResultAttemptReadSerializer):
+    """Detalhe: metadados + conteúdo da versão exacta + contexto mínimo da execução.
+
+    `content` e `execution_context` são injectados pela vista (lidos do
+    armazenamento / da execução), não são colunas da BD.
+    """
+
+    content = serializers.CharField(read_only=True)
+    execution_context = serializers.JSONField(read_only=True)
+
+    class Meta(ResultAttemptReadSerializer.Meta):
+        fields = ResultAttemptReadSerializer.Meta.fields + (
+            "content",
+            "execution_context",
+        )
+        read_only_fields = fields
+
+
+class ResultReviewReadSerializer(serializers.ModelSerializer):
+    """Metadados de uma revisão (histórico mínimo; nunca o conteúdo do resultado).
+
+    `observations` é o texto do próprio revisor (não o resultado importado) e é
+    apresentado no histórico. O conteúdo integral do resultado vive apenas na
+    `DocumentVersion` da tentativa e nunca é copiado para a revisão.
+    """
+
+    organisation = serializers.UUIDField(source="organisation_id", read_only=True)
+    execution = serializers.UUIDField(source="execution_id", read_only=True)
+    result_attempt = serializers.UUIDField(source="result_attempt_id", read_only=True)
+    attempt_number = serializers.IntegerField(
+        source="result_attempt.attempt_number", read_only=True
+    )
+    reviewer = serializers.UUIDField(source="reviewer_id", read_only=True)
+
+    class Meta:
+        model = ResultReview
+        fields = (
+            "id",
+            "organisation",
+            "execution",
+            "result_attempt",
+            "attempt_number",
+            "reviewer",
+            "decision",
+            "observations",
+            "created_at",
+        )
+        read_only_fields = fields
+
+
+class ResultApplicationReadSerializer(serializers.ModelSerializer):
+    """Metadados de uma aplicação (sem conteúdo aplicado; só a ligação oficial).
+
+    Devolve a ligação execução↔versão criada (`created_document_version`) e a versão
+    base, com os números/checksums de versão como metadados — nunca o conteúdo
+    integral do resultado nem da versão.
+    """
+
+    organisation = serializers.UUIDField(source="organisation_id", read_only=True)
+    execution = serializers.UUIDField(source="execution_id", read_only=True)
+    result_attempt = serializers.UUIDField(source="result_attempt_id", read_only=True)
+    attempt_number = serializers.IntegerField(
+        source="result_attempt.attempt_number", read_only=True
+    )
+    review = serializers.UUIDField(source="review_id", read_only=True)
+    applied_by = serializers.UUIDField(source="applied_by_id", read_only=True)
+    target_document = serializers.UUIDField(
+        source="target_document_id", read_only=True, allow_null=True
+    )
+    base_document_version = serializers.UUIDField(
+        source="base_document_version_id", read_only=True, allow_null=True
+    )
+    created_document_version = serializers.UUIDField(
+        source="created_document_version_id", read_only=True, allow_null=True
+    )
+    target_decision = serializers.UUIDField(
+        source="target_decision_id", read_only=True, allow_null=True
+    )
+    created_decision = serializers.UUIDField(
+        source="created_decision_id", read_only=True, allow_null=True
+    )
+    target_work_item = serializers.UUIDField(
+        source="target_work_item_id", read_only=True, allow_null=True
+    )
+    base_version_number = serializers.SerializerMethodField()
+    created_version_number = serializers.SerializerMethodField()
+    created_version_checksum = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ResultApplication
+        fields = (
+            "id",
+            "organisation",
+            "execution",
+            "result_attempt",
+            "attempt_number",
+            "review",
+            "application_type",
+            "applied_by",
+            "change_summary",
+            "rationale",
+            "target_document",
+            "base_document_version",
+            "created_document_version",
+            "target_decision",
+            "created_decision",
+            "target_work_item",
+            "base_version_number",
+            "created_version_number",
+            "created_version_checksum",
+            "created_at",
+        )
+        read_only_fields = fields
+
+    def get_base_version_number(self, obj):
+        return (
+            obj.base_document_version.version_number
+            if obj.base_document_version_id
+            else None
+        )
+
+    def get_created_version_number(self, obj):
+        return (
+            obj.created_document_version.version_number
+            if obj.created_document_version_id
+            else None
+        )
+
+    def get_created_version_checksum(self, obj):
+        return (
+            obj.created_document_version.checksum
+            if obj.created_document_version_id
+            else None
+        )

@@ -11,6 +11,7 @@ from django.test import TransactionTestCase
 TABLES = (
     "executions_aiexecution",
     "executions_executioncontextdocument",
+    "executions_resultattempt",
 )
 
 
@@ -32,10 +33,12 @@ class ExecutionsMigrationTests(TransactionTestCase):
 
     def test_migration_applies_and_reverts(self):
         self.assertTrue(self._tables_exist())
+        # Reverte todas as migrações do módulo (remove as três tabelas).
         self._migrate([("executions", None)])
         names = connection.introspection.table_names()
         self.assertFalse(any(t in names for t in TABLES))
-        self._migrate([("executions", "0001_initial")])
+        # Reaplica na íntegra (0001 + 0002) e confirma as três tabelas.
+        call_command("migrate", "executions", verbosity=0)
         self.assertTrue(self._tables_exist())
 
     def test_no_migration_drift(self):

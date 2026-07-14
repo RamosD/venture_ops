@@ -131,6 +131,39 @@ export async function apiPostWithStatus<T>(
   return { status: response.status, data };
 }
 
+// POST multipart/form-data (upload). Suporte mínimo: NÃO define Content-Type
+// manualmente — o browser gera o boundary a partir do FormData. Mantém sessão e
+// CSRF; devolve estado + corpo (como `apiPostWithStatus`) para o chamador tratar
+// 201/400/409/413 sem lançar.
+export async function apiPostFormWithStatus<T>(
+  path: string,
+  form: FormData,
+): Promise<{ status: number; data: T }> {
+  const url = `${API_BASE_URL}${path}`;
+  const headers: Record<string, string> = { Accept: "application/json" };
+  // Sem "Content-Type": o browser define multipart/form-data + boundary.
+  const token = getCookie("csrftoken");
+  if (token) headers["X-CSRFToken"] = token;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers,
+      credentials: "same-origin",
+      body: form,
+    });
+  } catch {
+    throw new ApiError("Falha de comunicação com o servidor.");
+  }
+  if (response.status === 401 || response.status === 403) {
+    unauthorizedHandler?.();
+  }
+  const data =
+    response.status === 204 ? (undefined as T) : ((await response.json()) as T);
+  return { status: response.status, data };
+}
+
 // POST que devolve um binário (descarga do pacote). Lê o nome do ficheiro do
 // Content-Disposition (gerado/validado pelo servidor) e o checksum do header.
 export async function apiPostBlob(

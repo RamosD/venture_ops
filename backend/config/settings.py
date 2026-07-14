@@ -183,3 +183,13 @@ RATE_LIMIT_RETENTION_SECONDS = int(
 )
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# --- Aceleração da suite de testes ------------------------------------------
+# Hasher rápido **apenas** quando a suite de testes corre (`manage.py test`).
+# Não altera o comportamento de segurança em runtime real (produção usa os
+# hashers por omissão do Django). Evita que o PBKDF2 domine o tempo dos testes
+# de API (muitas autenticações por teste).
+import sys as _sys  # noqa: E402
+
+if "test" in _sys.argv:
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]

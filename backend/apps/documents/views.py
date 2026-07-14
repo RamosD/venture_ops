@@ -69,6 +69,17 @@ def _resolve_or_not_found(request: Request, organisation, pk) -> Document:
     raise NotFound()
 
 
+def _is_result_linked(document: Document) -> bool:
+    """Indica se o documento está ligado a uma tentativa de resultado.
+
+    Consulta a relação inversa `result_attempts` (definida em `executions`) sem
+    importar esse módulo — evita ciclo de dependências. Documentos de resultado
+    são geridos pela execução (F1-P06-PR01): a API genérica não os edita nem
+    recupera (mas a leitura continua permitida).
+    """
+    return document.versions.filter(result_attempts__isnull=False).exists()
+
+
 def _detail_payload(document: Document) -> dict:
     """Serializa o detalhe com o conteúdo da versão actual (lido do armazenamento)."""
     data = DocumentReadSerializer(document).data
@@ -240,6 +251,14 @@ class DocumentDetailView(APIView):
     @method_decorator(csrf_protect)
     def patch(self, request: Request, pk) -> Response:
         _membership, organisation = require_context(request)
+        # Documento ligado a uma tentativa de resultado é gerido pela execução:
+        # a API genérica não o edita (leitura continua permitida).
+        document = _resolve_or_not_found(request, organisation, pk)  # 404+audit alheio
+        if _is_result_linked(document):
+            return Response(
+                {"detail": "Documento de resultado gerido pela execução; não editável."},
+                status=status.HTTP_409_CONFLICT,
+            )
         serializer = DocumentUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
@@ -332,6 +351,12 @@ class DocumentRestoreView(APIView):
     @method_decorator(csrf_protect)
     def post(self, request: Request, pk) -> Response:
         _membership, organisation = require_context(request)
+        document = _resolve_or_not_found(request, organisation, pk)  # 404+audit alheio
+        if _is_result_linked(document):
+            return Response(
+                {"detail": "Documento de resultado gerido pela execução; não recuperável."},
+                status=status.HTTP_409_CONFLICT,
+            )
         serializer = DocumentRestoreSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data

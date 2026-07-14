@@ -107,6 +107,9 @@ function installFetch(handlers: Handlers) {
     const method = init.method ?? "GET";
     const body = init.body ? JSON.parse(init.body as string) : {};
     calls.push({ url: rawUrl, method, body });
+    if (rawUrl.match(/\/result-attempts$/) && method === "GET") {
+      return json({ results: [] });
+    }
     if (rawUrl.includes("/context-package/preview")) {
       return handlers.preview
         ? handlers.preview(body)

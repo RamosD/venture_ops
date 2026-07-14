@@ -124,6 +124,17 @@ class DocumentCreateSerializer(_StrictInputSerializer):
         {"title", "document_type", "content", "product", "is_outdated", "export_policy"}
     )
 
+    def validate_document_type(self, value):
+        # Documentos `resultado` são materializados **exclusivamente** pela
+        # importação de resultado da execução (F1-P06-PR01); a API documental
+        # genérica não os cria (evita resultados órfãos, sem tentativa).
+        if value == DocumentType.RESULT:
+            raise serializers.ValidationError(
+                "Documentos do tipo 'resultado' são criados pela importação de "
+                "resultado da execução, não pela API documental genérica."
+            )
+        return value
+
 
 class DocumentUpdateSerializer(_StrictInputSerializer):
     """Edição: exige `expected_version`.
